@@ -112,7 +112,7 @@ console.log(keranjang.toString());
 console.log(`Subtotal: ${keranjang.subtotal}`);
 // Output: Subtotal: 45000
 // Test updateQuantity
-keranjang.updateQuantity(60);
+keranjang.updateQuantity(6);
 console.log(`Quantity setelah update: ${keranjang.quantity}`);
 // Output: Quantity setelah update: 6
 // Test validasi updateQuantity
