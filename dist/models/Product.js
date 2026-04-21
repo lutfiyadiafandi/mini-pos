@@ -1,8 +1,8 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Product = void 0;
-class Product {
-    _id;
+const BaseModel_1 = require("./BaseModel");
+class Product extends BaseModel_1.BaseModel {
     _sku;
     _name;
     _price;
@@ -10,11 +10,8 @@ class Product {
     _categoryId;
     _description;
     _isActive = true;
-    _createdAt;
     constructor(id, sku, name, price, stock, categoryId, description = "") {
-        // Validasi di constructor - object tidak boleh lahir dalam state invalid
-        if (id < 0)
-            throw new Error("ID tidak boleh negatif");
+        super(id);
         if (!sku || sku.trim().length === 0)
             throw new Error("SKU tidak boleh kosong");
         const skuRegex = /^[A-Za-z]{2}\d{3}$/;
@@ -29,19 +26,14 @@ class Product {
             throw new Error("Stok tidak boleh negatif");
         if (categoryId <= 0)
             throw new Error("Category ID harus lebih dari 0");
-        this._id = id;
         this._sku = sku.trim().toUpperCase();
         this._name = name.trim();
         this._price = price;
         this._stock = stock;
         this._categoryId = categoryId;
         this._description = description.trim();
-        this._createdAt = new Date();
     }
     // Getter
-    get id() {
-        return this._id;
-    }
     get sku() {
         return this._sku;
     }
@@ -62,9 +54,6 @@ class Product {
     }
     get isActive() {
         return this._isActive;
-    }
-    get createdAt() {
-        return this._createdAt;
     }
     // Computed property - bukan stored, dihitung dari data lain
     get formattedPrice() {
@@ -114,7 +103,7 @@ class Product {
      */
     addStock(qty) {
         if (qty <= 0)
-            throw new Error("QUantity harus positif");
+            throw new Error("Quantity harus positif");
         this._stock += qty;
     }
     /**
@@ -132,6 +121,7 @@ class Product {
     /**
      * Representasi string untuk logging/debugging.
      */
+    // Override toString dari BaseModel
     toString() {
         const status = this._isActive ? "Active" : "Inactive";
         const stockWarning = this.isLowStock ? " _ LOW STOCK" : "";

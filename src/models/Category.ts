@@ -1,24 +1,21 @@
-export class Category {
-  private _id: number;
+import { BaseModel } from "./BaseModel";
+
+export class Category extends BaseModel {
   private _name: string;
   private _description: string;
 
   constructor(id: number, name: string, description: string = "") {
-    if (id <= 0) throw new Error("ID harus lebih dari 0");
+    super(id);
+
     if (!name || name.trim().length === 0) {
       throw new Error("Nama kategori tidak boleh kosong");
     }
 
-    this._id = id;
     this._name = name.trim();
     this._description = description.trim();
   }
 
   // Getter
-  get id(): number {
-    return this._id;
-  }
-
   get name(): string {
     return this._name;
   }
@@ -40,7 +37,7 @@ export class Category {
   }
 
   // Method
-  toString(): string {
+  override toString(): string {
     return `[Category#${this._id}] ${this._name}`;
   }
 }

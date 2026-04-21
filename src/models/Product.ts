@@ -1,5 +1,6 @@
-export class Product {
-  private _id: number;
+import { BaseModel } from "./BaseModel";
+
+export class Product extends BaseModel {
   private _sku: string;
   private _name: string;
   private _price: number;
@@ -7,7 +8,6 @@ export class Product {
   private _categoryId: number;
   private _description: string;
   private _isActive: boolean = true;
-  private _createdAt: Date;
 
   constructor(
     id: number,
@@ -18,8 +18,8 @@ export class Product {
     categoryId: number,
     description: string = "",
   ) {
-    // Validasi di constructor - object tidak boleh lahir dalam state invalid
-    if (id < 0) throw new Error("ID tidak boleh negatif");
+    super(id);
+
     if (!sku || sku.trim().length === 0)
       throw new Error("SKU tidak boleh kosong");
     const skuRegex = /^[A-Za-z]{2}\d{3}$/;
@@ -34,20 +34,15 @@ export class Product {
     if (stock < 0) throw new Error("Stok tidak boleh negatif");
     if (categoryId <= 0) throw new Error("Category ID harus lebih dari 0");
 
-    this._id = id;
     this._sku = sku.trim().toUpperCase();
     this._name = name.trim();
     this._price = price;
     this._stock = stock;
     this._categoryId = categoryId;
     this._description = description.trim();
-    this._createdAt = new Date();
   }
 
   // Getter
-  get id(): number {
-    return this._id;
-  }
   get sku(): string {
     return this._sku;
   }
@@ -68,9 +63,6 @@ export class Product {
   }
   get isActive(): boolean {
     return this._isActive;
-  }
-  get createdAt(): Date {
-    return this._createdAt;
   }
 
   // Computed property - bukan stored, dihitung dari data lain
@@ -126,7 +118,7 @@ export class Product {
    * Menambah stok produk (restock)
    */
   addStock(qty: number) {
-    if (qty <= 0) throw new Error("QUantity harus positif");
+    if (qty <= 0) throw new Error("Quantity harus positif");
     this._stock += qty;
   }
 
@@ -147,7 +139,8 @@ export class Product {
   /**
    * Representasi string untuk logging/debugging.
    */
-  toString(): string {
+  // Override toString dari BaseModel
+  override toString(): string {
     const status = this._isActive ? "Active" : "Inactive";
     const stockWarning = this.isLowStock ? " _ LOW STOCK" : "";
     return (

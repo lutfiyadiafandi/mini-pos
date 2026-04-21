@@ -1,24 +1,19 @@
 "use strict";
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.Category = void 0;
-class Category {
-    _id;
+const BaseModel_1 = require("./BaseModel");
+class Category extends BaseModel_1.BaseModel {
     _name;
     _description;
     constructor(id, name, description = "") {
-        if (id <= 0)
-            throw new Error("ID harus lebih dari 0");
+        super(id);
         if (!name || name.trim().length === 0) {
             throw new Error("Nama kategori tidak boleh kosong");
         }
-        this._id = id;
         this._name = name.trim();
         this._description = description.trim();
     }
     // Getter
-    get id() {
-        return this._id;
-    }
     get name() {
         return this._name;
     }
