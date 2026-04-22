@@ -118,16 +118,36 @@ class Product extends BaseModel_1.BaseModel {
     activate() {
         this._isActive = true;
     }
+    // Implementasi Displayable
+    toDisplayString() {
+        const stockWarning = this.isLowStock ? " _" : "";
+        return `${this._sku} | ${this._name} | ${this.formattedPrice} | Stok: ${this._stock}${stockWarning}`;
+    }
+    toDetailString() {
+        return [
+            `ID       : ${this._id}`,
+            `SKU      : ${this._sku}`,
+            `Nama     : ${this._name}`,
+            `Harga    : ${this.formattedPrice}`,
+            `Stok     : ${this._stock}${this.isLowStock ? " (LOW STOCK)" : ""}`,
+            `Kategori : #${this._categoryId}`,
+            `Deskripsi: ${this._description || "-"}`,
+            `Status   : ${this._isActive ? "Active" : "Inactive"}`,
+            `Dibuat   : ${this.createdAt.toLocaleString("id-ID")}`,
+        ].join("\n");
+    }
+    // Implementasi Searchable
+    matches(keyword) {
+        const lower = keyword.toLowerCase();
+        return (this._name.toLowerCase().includes(lower) ||
+            this._sku.toLowerCase().includes(lower));
+    }
     /**
      * Representasi string untuk logging/debugging.
      */
     // Override toString dari BaseModel
     toString() {
-        const status = this._isActive ? "Active" : "Inactive";
-        const stockWarning = this.isLowStock ? " _ LOW STOCK" : "";
-        return (`[Product#${this._id}] ${this._sku} - ${this._name} | ` +
-            `${this.formattedPrice} | ` +
-            `Stok: ${this._stock}${stockWarning} | ${status}`);
+        return this.toDisplayString();
     }
 }
 exports.Product = Product;

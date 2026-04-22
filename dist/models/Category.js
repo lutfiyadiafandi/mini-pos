@@ -30,6 +30,11 @@ class Category extends BaseModel_1.BaseModel {
     set description(value) {
         this._description = value.trim();
     }
+    // Implementasi Searchable
+    matches(keyword) {
+        const lower = keyword.toLowerCase();
+        return this._name.toLowerCase().includes(lower);
+    }
     // Method
     toString() {
         return `[Category#${this._id}] ${this._name}`;

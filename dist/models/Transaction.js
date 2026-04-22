@@ -3,6 +3,7 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.Transaction = void 0;
 const BaseModel_1 = require("./BaseModel");
 class Transaction extends BaseModel_1.BaseModel {
+    static _nextId = 1;
     _code;
     _userId;
     _items = [];
@@ -11,7 +12,7 @@ class Transaction extends BaseModel_1.BaseModel {
     _status = "PENDING";
     _transactionDate;
     constructor(userId, paymentMethod) {
-        super(0);
+        super(Transaction._nextId++);
         if (userId <= 0)
             throw new Error("User ID tidak boleh negatif");
         if (!["CASH", "QRIS", "TRANSFER"].includes(paymentMethod))

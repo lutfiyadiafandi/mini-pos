@@ -12,6 +12,8 @@ type PaymentMethod = "CASH" | "QRIS" | "TRANSFER";
 type TransactionStatus = "PENDING" | "SUCCESS" | "FAILED";
 
 export class Transaction extends BaseModel {
+  private static _nextId: number = 1;
+
   private _code: string;
   private _userId: number;
   private _items: TransactionItem[] = [];
@@ -21,7 +23,7 @@ export class Transaction extends BaseModel {
   private _transactionDate: Date;
 
   constructor(userId: number, paymentMethod: PaymentMethod) {
-    super(0);
+    super(Transaction._nextId++);
 
     if (userId <= 0) throw new Error("User ID tidak boleh negatif");
     if (!["CASH", "QRIS", "TRANSFER"].includes(paymentMethod))

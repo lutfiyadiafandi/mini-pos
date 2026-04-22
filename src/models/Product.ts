@@ -1,6 +1,8 @@
+import { Displayable } from "../interfaces/Displayable";
+import { Searchable } from "../interfaces/Searchable";
 import { BaseModel } from "./BaseModel";
 
-export class Product extends BaseModel {
+export class Product extends BaseModel implements Displayable, Searchable {
   private _sku: string;
   private _name: string;
   private _price: number;
@@ -136,17 +138,39 @@ export class Product extends BaseModel {
     this._isActive = true;
   }
 
+  // Implementasi Displayable
+  toDisplayString(): string {
+    const stockWarning = this.isLowStock ? " _" : "";
+    return `${this._sku} | ${this._name} | ${this.formattedPrice} | Stok: ${this._stock}${stockWarning}`;
+  }
+  toDetailString(): string {
+    return [
+      `ID       : ${this._id}`,
+      `SKU      : ${this._sku}`,
+      `Nama     : ${this._name}`,
+      `Harga    : ${this.formattedPrice}`,
+      `Stok     : ${this._stock}${this.isLowStock ? " (LOW STOCK)" : ""}`,
+      `Kategori : #${this._categoryId}`,
+      `Deskripsi: ${this._description || "-"}`,
+      `Status   : ${this._isActive ? "Active" : "Inactive"}`,
+      `Dibuat   : ${this.createdAt.toLocaleString("id-ID")}`,
+    ].join("\n");
+  }
+
+  // Implementasi Searchable
+  matches(keyword: string): boolean {
+    const lower = keyword.toLowerCase();
+    return (
+      this._name.toLowerCase().includes(lower) ||
+      this._sku.toLowerCase().includes(lower)
+    );
+  }
+
   /**
    * Representasi string untuk logging/debugging.
    */
   // Override toString dari BaseModel
   override toString(): string {
-    const status = this._isActive ? "Active" : "Inactive";
-    const stockWarning = this.isLowStock ? " _ LOW STOCK" : "";
-    return (
-      `[Product#${this._id}] ${this._sku} - ${this._name} | ` +
-      `${this.formattedPrice} | ` +
-      `Stok: ${this._stock}${stockWarning} | ${status}`
-    );
+    return this.toDisplayString();
   }
 }
