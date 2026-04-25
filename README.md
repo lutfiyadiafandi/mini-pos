@@ -1,6 +1,6 @@
 # MINI-POS
 
-Praktikum 04
+Praktikum 05
 
 By Lutfiyadi Afandi - A18.2024.00157
 
@@ -14,8 +14,7 @@ Langkah-langkah untuk menginstal:
 
 ## Fitur Tambahan
 
-1. buat CreditCardPayment
-2. method getPaymentStrategy
-3. buat Discriminated Union type untuk PaymentOption
-4. melengkapi TransferPayment
-5. buat TransactionService
+1. method getRevenueByCategory
+2. method getHourlyDistribution
+3. method compareDaily
+4. melengkapi exportToCSV

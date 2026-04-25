@@ -18,219 +18,162 @@ import { PaymentConfig, PaymentStrategy } from "./interfaces/PaymentStrategy";
 import { PaymentFactory } from "./strategies/PaymentFactory";
 import { CreditCardPayment } from "./strategies/CreditCardPayment";
 import { TransactionService } from "./services/TransactionService";
+import {
+  seedCategories,
+  seedProducts,
+  seedTransactions,
+} from "./data/SeedData";
+import { SalesReport } from "./reports/SalesReport";
+import { ProductAnalytics } from "./reports/ProductAnalytics";
 
-const AMOUNT = 35_000;
+// ========================== SEED DATA =========================
+console.log("================= SEED DATA ==================\n");
 
-// ========================== TEST INDIVIDUAL PAYMENT =========================
-console.log("================= TEST INDIVIDUAL PAYMENT ==================\n");
+const categories = seedCategories();
+const products = seedProducts();
+const transactions = seedTransactions();
 
-// 1. Cash - uang cukup
-const cash = new CashPayment(50_000);
-const cashResult = cash.processPayment(AMOUNT);
-console.log(`[${cash.methodName}] ${cashResult.message}`);
-console.log(`   Code: ${cashResult.transactionCode}`);
 console.log(
-  `   Kembalian: ${cashResult.changeAmount?.toLocaleString("id-ID")}`,
+  `Loaded: ${categories.length} categories, ${products.length} products, ${transactions.length} transactions`,
 );
 
-// 2. Cash - uang tidak cukup
-console.log();
-const cashInsufficient = new CashPayment(20_000);
-const failResult = cashInsufficient.processPayment(AMOUNT);
-console.log(`[${cashInsufficient.methodName}] ${failResult.message}`);
-console.log(`   Success: ${failResult.success}`);
+// ========================== SALES REPORT =========================
+console.log("\n================== SALES REPORT ===================\n");
 
-// 3. QRIS
-console.log();
-const qris = new QRISPayment();
-const qrisResult = qris.processPayment(AMOUNT);
-console.log(`[${qris.methodName}] ${qrisResult.message}`);
+const salesReport = new SalesReport(transactions);
 
-// 4. Transfer
-console.log();
-const transfer = new TransferPayment("BNI");
-const transferResult = transfer.processPayment(AMOUNT);
-console.log(`[${transfer.methodName}] ${transferResult.message}`);
-
-// ========================== POLYMORPHISM IN ACTION =========================
+// Total Revenue
 console.log(
-  "\n================== POLYMORPHISM IN ACTION ===================\n",
+  `Total Revenue: ${salesReport.totalRevenue().toLocaleString("id-ID")}`,
+);
+console.log(
+  `Successful Transactions: ${salesReport.successfulTransactionCount()}`,
 );
 
-// Array bertipe PaymentStrategy[]
-const strategies: PaymentStrategy[] = [
-  PaymentFactory.create({ method: "CASH", cashReceived: 50_000 }),
-  PaymentFactory.create({ method: "QRIS" }),
-  PaymentFactory.create({ method: "TRANSFER", bankName: "MANDIRI" }),
-];
+// Revenue by Payment method
+console.log("\nRevenue by Payment Method:");
+const revenueByMethod = salesReport.revenuePaymentMethod();
+for (const [method, revenue] of revenueByMethod) {
+  console.log(`   ${method.padEnd(10)} Rp ${revenue.toLocaleString("id-ID")}`);
+}
 
-// Loop
-for (const strategy of strategies) {
-  const result = strategy.processPayment(AMOUNT);
-  const status = result.success ? "✅" : "❌";
+// Revenue By Category
+console.log("\nRevenue by Category:");
+const revenueByCategory = salesReport.getRevenueByCategory(
+  categories,
+  products,
+);
+for (const [catName, revenue] of revenueByCategory) {
+  console.log(`   ${catName.padEnd(15)} Rp ${revenue.toLocaleString("id-ID")}`);
+}
+
+// Top selling products
+console.log("\nTop 5 Selling Products:");
+const topProducts = salesReport.topSellingProducts(5);
+for (const [i, product] of topProducts.entries()) {
   console.log(
-    `${status} [${strategy.methodName.padEnd(10)}] ${result.message}`,
+    `   ${i + 1}. ${product.productName.padEnd(20)} ` +
+      `Qty: ${String(product.qtySold).padStart(3)} | ` +
+      `Revenue: Rp ${product.revenue.toLocaleString("id-ID")}`,
   );
 }
 
-// ============= TEST DISCRIMINATED UNION (PaymentConfig) =============
-console.log("\n========== TEST DISCRIMINATED UNION ===============\n");
+// Daily Summary
+console.log("\nDaily Summary (2026-02-01)");
+const feb1 = salesReport.dailySummary("2026-02-01");
+console.log(`   Transactions: ${feb1.count}`);
+console.log(`   Revenue: ${feb1.revenue.toLocaleString("id-ID")}`);
 
+// Daily Revenue
+console.log("\nDaily Revenue");
+const dailyRevenue = salesReport.dailyRevenue();
+for (const [date, revenue] of dailyRevenue) {
+  const bar = "█".repeat(Math.round(revenue / 10_000));
+  console.log(
+    `   ${date} | Rp ${String(revenue.toLocaleString("id-ID")).padStart(10)} | ${bar}`,
+  );
+}
+
+// Distribusi Transaksi per jam
+console.log("\nDistribusi Transaksi per Jam:");
+const hourDist = salesReport.getHourDistribution();
+for (const [hour, count] of hourDist) {
+  const bar = "█".repeat(count);
+  console.log(
+    `   Jam: ${String(hour).padStart(2)}:00 | ${count} transaksi | ${bar}`,
+  );
+}
+
+// Perbandingan antara hari dengan hari lainnya
+console.log("\nPerbandingan Harian:");
+const comparison = salesReport.compareDaily("2026-02-01", "2026-02-03");
 console.log(
-  "Avaiable methods:",
-  PaymentFactory.getAvailableMethods().join(", "),
+  `   Tanggal ${comparison.date1.date} | Total: ${comparison.date1.count} transaksi | Revenue: Rp ${comparison.date1.revenue.toLocaleString("id-ID")}`,
 );
-
-// Type-safe
-const configs: PaymentConfig[] = [
-  { method: "CASH", cashReceived: 50_000 },
-  { method: "QRIS" },
-  { method: "TRANSFER", bankName: "BRI" },
-  {
-    method: "CREDIT_CARD",
-    cardNumber: "1234567890123456",
-    expiryDate: "12/27",
-    cvv: "123",
-  },
-];
-
-for (const config of configs) {
-  const strategy = PaymentFactory.create(config);
-  console.log(strategy.getPaymentSummary());
-}
-
-// =================== TEST CREDIT CARD ===================
-console.log("\n================ TEST CREDIT CARD =================\n");
-
-const cc = PaymentFactory.create({
-  method: "CREDIT_CARD",
-  cardNumber: "1234567890123456",
-  expiryDate: "12/27",
-  cvv: "123",
-});
-console.log(`${cc.getPaymentSummary()}`);
-const ccResult = cc.processPayment(AMOUNT);
-console.log(`[${cc.methodName}] ${ccResult.message}`);
-
-// Validasi nomor kartu salah
-try {
-  PaymentFactory.create({
-    method: "CREDIT_CARD",
-    cardNumber: "123",
-    expiryDate: "12/27",
-    cvv: "123",
-  });
-} catch (err) {
-  console.error(`Error (expected): ${(err as Error).message}`);
-}
-
-// Validasi kartu expired
-try {
-  PaymentFactory.create({
-    method: "CREDIT_CARD",
-    cardNumber: "1234567890123456",
-    expiryDate: "01/20",
-    cvv: "123",
-  });
-} catch (err) {
-  console.error(`Error (expected): ${(err as Error).message}`);
-}
-
-// ================ TEST TRANSFER VALIDATION ==================
-console.log("\n============ TEST TRANSFER VALIDATION ==============\n");
-
-try {
-  new TransferPayment("BITCOIN");
-} catch (err) {
-  console.error(`Error (expected): ${(err as Error).message}`);
-}
-
-// Format berbeda per bank
-for (const bank of ["BCA", "BNI", "BRI", "MANDIRI"]) {
-  const tf = new TransferPayment(bank);
-  const rek = tf.processPayment(AMOUNT);
-  console.log(`[${bank}] ${rek.message}`);
-}
-
-// ================ TEST TRANSACTION SERVICE ==================
-console.log("\n============ TEST TRANSACTION SERVICE ==============\n");
-
-// Repository instances
-const categoryRepo = new CategoryRepository();
-const productRepo = new ProductRepository();
-const service = new TransactionService(productRepo);
-
-// Seed categories
-categoryRepo.add(new Category(1, "Makanan", "Kategori makananan"));
-categoryRepo.add(new Category(2, "Minuman", "Kategori minuman"));
-categoryRepo.add(new Category(3, "Snack", "Kategori snack"));
-
-// Seed products
-const products = [
-  new Product(1, "FD001", "Nasi Goreng", 15_000, 50, 1, "Nasi goreng spesial"),
-  new Product(2, "BV001", "Teh Botol", 5_000, 3, 2, "Teh botol sosro"),
-  new Product(
-    3,
-    "SN001",
-    "Chitato",
-    10_000,
-    30,
-    3,
-    "Chitato rasa sapi panggang",
-  ),
-  new Product(4, "FD002", "Mie Goreng", 12_000, 2, 1, "Mie goreng spesial"),
-  new Product(5, "BV002", "Kopi Susu", 8_000, 100, 2, "Kopi susu gula aren"),
-];
-for (const product of products) {
-  productRepo.add(product);
-}
-
-// Checkout dengan CASH
-service.checkout(
-  [
-    { productId: 1, quantity: 2 },
-    { productId: 3, quantity: 1 },
-  ],
-  PaymentFactory.create({ method: "CASH", cashReceived: 50_000 }),
+console.log(
+  `   Tanggal ${comparison.date2.date} | Total: ${comparison.date2.count} transaksi | Revenue: Rp ${comparison.date2.revenue.toLocaleString("id-ID")}`,
 );
-
-// Checkout dengan QRIS
-service.checkout(
-  [
-    { productId: 2, quantity: 1 },
-    { productId: 4, quantity: 1 },
-  ],
-  PaymentFactory.create({ method: "QRIS" }),
+console.log(
+  `   Selisih revenue: Rp ${comparison.revenueDiff.toLocaleString("id-ID")}`,
 );
+console.log(`   Hari dengan revenue lebih banyak: ${comparison.winner}`);
 
-// Checkout dengan TRANSFER
-service.checkout(
-  [
-    { productId: 5, quantity: 2 },
-    { productId: 2, quantity: 1 },
-  ],
-  PaymentFactory.create({ method: "TRANSFER", bankName: "MANDIRI" }),
+// CSV Export
+console.log("\nCSV Export");
+const csv = salesReport.exportToCSV();
+const csvLines = csv.split("\n");
+for (const line of csvLines.slice(0, 6)) {
+  console.log(`   ${line}`);
+}
+
+// =================== PRODUCT ANALYTICS ===================
+console.log("\n================ PRODUCT ANALYTICS =================\n");
+
+const analytics = new ProductAnalytics(products);
+
+// Summary
+const summary = analytics.getSummary();
+console.log("Product Summary:");
+console.log(`   Total Products: ${summary.totalProducts}`);
+console.log(`   Activate Products: ${summary.activeProducts}`);
+console.log(
+  `   Total Stock Value: Rp ${summary.totalStockValue.toLocaleString("id-ID")}`,
 );
-
-// Checkout dengan CREDIT CARD
-service.checkout(
-  [{ productId: 2, quantity: 1 }],
-  PaymentFactory.create({
-    method: "CREDIT_CARD",
-    cardNumber: "9876543210987654",
-    expiryDate: "06/28",
-    cvv: "456",
-  }),
+console.log(
+  `   Average Price: Rp ${summary.averagePrice.toLocaleString("id-ID")}`,
 );
+console.log(`   Low Stock Count: ${summary.lowStockCount}`);
 
-// Checkout produk tidak ada
-try {
-  service.checkout(
-    [{ productId: 99, quantity: 1 }],
-    PaymentFactory.create({ method: "QRIS" }),
-  );
-} catch (err) {
-  console.error(`Error (expected): ${(err as Error).message}`);
+// Low Stock
+console.log("\nLow Stock Products:");
+const lowStock = analytics.getLowStockProducts();
+for (const p of lowStock) {
+  console.log(`  _ ${p.sku} - ${p.name}: ${p.stock} remaining`);
+}
+
+// By Category
+console.log("\nProducts By Category:");
+const byCategory = analytics.getByCategory();
+for (const [catId, prods] of byCategory) {
+  const catName = categories.find((c) => c.id === catId)?.name ?? "Unknown";
+  console.log(`   [${catName}]`);
+  for (const p of prods) {
+    console.log(`   - ${p.name} (${p.formattedPrice})`);
+  }
+}
+
+// Most Expensive
+console.log("\nTop 3 Most Expensive Products:");
+const expensive = analytics.getMostExpensive(3);
+for (const p of expensive) {
+  console.log(`   ${p.name}: ${p.formattedPrice}`);
+}
+
+// Search
+console.log("\nSeach 'nasi':");
+const searchResult = analytics.searchProducts("nasi");
+for (const p of searchResult) {
+  console.log(`   ${p.sku} - ${p.name}`);
 }
 
 console.log("\n===================== TEST SELESAI ======================");
