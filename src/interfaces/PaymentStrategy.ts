@@ -1,3 +1,15 @@
+// Discriminated Union yang type-safe
+export type PaymentConfig =
+  | { method: "CASH"; cashReceived: number }
+  | { method: "QRIS" }
+  | { method: "TRANSFER"; bankName?: string }
+  | {
+      method: "CREDIT_CARD";
+      cardNumber: string;
+      expiryDate: string;
+      cvv: string;
+    };
+
 /**
  * Hasil dari proses pembayaran
  * Interface ini menstandarisasi response dari semua payment method
@@ -32,4 +44,9 @@ export interface PaymentStrategy {
    * @returns true jika pembayaran valid, false jika tidak valid
    */
   validatePayment(amount: number): boolean;
+
+  /**
+   * Ringkasan informasi terkait payment method
+   */
+  getPaymentSummary(): string;
 }

@@ -1,6 +1,6 @@
 # MINI-POS
 
-Praktikum 03
+Praktikum 04
 
 By Lutfiyadi Afandi - A18.2024.00157
 
@@ -14,7 +14,8 @@ Langkah-langkah untuk menginstal:
 
 ## Fitur Tambahan
 
-1. interface Searchable
-2. method update() pada BaseRepository
-3. buat UserRepository extends BaseRepository
-4. buat TransactionRepository extends BaseRepository
+1. buat CreditCardPayment
+2. method getPaymentStrategy
+3. buat Discriminated Union type untuk PaymentOption
+4. melengkapi TransferPayment
+5. buat TransactionService
