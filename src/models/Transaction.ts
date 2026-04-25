@@ -1,40 +1,45 @@
 import { BaseModel } from "./BaseModel";
 import { Product } from "./Product";
 
-type TransactionItem = {
+export interface TransactionDetail {
   productId: number;
   productName: string;
   price: number;
   quantity: number;
   subtotal: number;
-};
-type PaymentMethod = "CASH" | "QRIS" | "TRANSFER";
+}
+type PaymentMethod = "CASH" | "QRIS" | "TRANSFER" | "CREDIT_CARD";
 type TransactionStatus = "PENDING" | "SUCCESS" | "FAILED";
 
 export class Transaction extends BaseModel {
-  private static _nextId: number = 1;
+  // private static _nextId: number = 1;
 
   private _code: string;
   private _userId: number;
-  private _items: TransactionItem[] = [];
+  private _items: TransactionDetail[] = [];
   private _totalAmount: number = 0;
   private _paymentMethod: PaymentMethod;
   private _status: TransactionStatus = "PENDING";
   private _transactionDate: Date;
 
-  constructor(userId: number, paymentMethod: PaymentMethod) {
-    super(Transaction._nextId++);
-
-    if (userId <= 0) throw new Error("User ID tidak boleh negatif");
-    if (!["CASH", "QRIS", "TRANSFER"].includes(paymentMethod))
-      throw new Error(
-        "Payment method tidak valid. Pilihan: CASH, QRIS, TRANSFER",
-      );
-
+  constructor(
+    id: number,
+    code: string,
+    userId: number,
+    items: TransactionDetail[],
+    totalAmount: number,
+    paymentMethod: PaymentMethod,
+    status: TransactionStatus = "PENDING",
+    transactionDate: Date = new Date(),
+  ) {
+    super(id);
+    this._code = code;
     this._userId = userId;
+    this._items = [...items];
+    this._totalAmount = totalAmount;
     this._paymentMethod = paymentMethod;
-    this._transactionDate = new Date();
-    this._code = `TRX-${this._transactionDate.getTime()}`;
+    this._status = status;
+    this._transactionDate = transactionDate;
   }
 
   // Getter
@@ -44,7 +49,7 @@ export class Transaction extends BaseModel {
   get userId(): number {
     return this._userId;
   }
-  get items(): TransactionItem[] {
+  get items(): TransactionDetail[] {
     return [...this._items];
   }
   get totalAmount(): number {
