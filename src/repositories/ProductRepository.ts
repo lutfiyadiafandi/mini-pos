@@ -20,7 +20,7 @@ export class ProductRepository {
   /*
    * Ambil semua produk aktif.
    */
-  findAll(page: number = 1, limit: number = 10): Product[] {
+  findAll(): Product[] {
     const rows = this.db
       // Belom selesai
       .prepare("SELECT * FROM products WHERE is_active = 1 ORDER BY name")

@@ -1,6 +1,6 @@
 # MINI-POS
 
-Praktikum 05
+Praktikum 06
 
 By Lutfiyadi Afandi - A18.2024.00157
 
@@ -14,7 +14,6 @@ Langkah-langkah untuk menginstal:
 
 ## Fitur Tambahan
 
-1. method getRevenueByCategory
-2. method getHourlyDistribution
-3. method compareDaily
-4. melengkapi exportToCSV
+1. Implementasi CategoryRepository
+2. Implementasi UserRepository
+3. Buat database/seed
