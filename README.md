@@ -1,6 +1,6 @@
 # MINI-POS
 
-Praktikum 06
+Praktikum 07
 
 By Lutfiyadi Afandi - A18.2024.00157
 
@@ -14,6 +14,4 @@ Langkah-langkah untuk menginstal:
 
 ## Fitur Tambahan
 
-1. Implementasi CategoryRepository
-2. Implementasi UserRepository
-3. Buat database/seed
+1. Implementasi AuthService dengan SHA-256 hashing password

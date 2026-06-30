@@ -33,8 +33,8 @@ export class CashPayment implements PaymentStrategy {
       return {
         success: false,
         message:
-          `Uang tidak cukup: diterima Rp ${this.cashReceived.toLocaleString("id-ID")}, ` +
-          `dibutuhkan Rp ${amount.toLocaleString("id-ID")}`,
+          `Uang tidak cukup (diterima Rp ${this.cashReceived.toLocaleString("id-ID")}, ` +
+          `dibutuhkan Rp ${amount.toLocaleString("id-ID")})`,
         transactionCode: "",
       };
     }

@@ -1,224 +1,175 @@
 import { DatabaseConnection } from "./database/connection.js";
 import { ProductRepository } from "./repositories/ProductRepository.js";
-import { NotFoundError, ValidationError } from "./errors/AppError.js";
 import { CategoryRepository } from "./repositories/CategoryRepository.js";
-import { UserRepository } from "./repositories/UserRepository.js";
+import { TransactionRepository } from "./repositories/TransactionRepository.js";
+import { ProductService } from "./services/ProductService.js";
+import { AuthService } from "./services/AuthService.js";
+import { TransactionService } from "./services/TransactionService.js";
+import { PaymentFactory } from "./strategies/PaymentFactory.js";
+import { ValidationError } from "./errors/AppError.js";
 
 //  ================= INITIALIZE DATABASE =================
 console.log("================= INITIALIZE DATABASE =================\n");
-
-// Inisialisasi database (buat tabel + seed data)
 DatabaseConnection.initialize();
 
+// Repositories
 const productRepo = new ProductRepository();
 const categoryRepo = new CategoryRepository();
-const userRepo = new UserRepository();
+const transactionRepo = new TransactionRepository();
 
-// ================= TEST FIND ALL =================
-console.log("\n================= FIND ALL PRODUCTS =================\n");
+// Services (Dependency Injection repo diberikan via constructor)
+const productService = new ProductService(productRepo, categoryRepo);
+const authService = new AuthService();
+const transactionService = new TransactionService(transactionRepo, productRepo);
 
-const allProducts = productRepo.findAll();
-console.log(`Total products: ${allProducts.length}`);
-for (const p of allProducts) {
-  console.log(
-    `${p.sku.padEnd(6)} ${p.name.padEnd(20)} Rp ${p.price.toLocaleString("id-ID")}`,
-  );
+//  ================= TEST AUTH =================
+console.log("\n================= TEST AUTH =================\n");
+
+try {
+  const user = authService.login("kasir01", "kasir123");
+  console.log(`Logged in as: ${user.fullName} (${user.username})`);
+} catch (err) {
+  console.log(`Login failed: ${(err as Error).message}`);
 }
 
-// ================= TEST FIND BY ID =================
-console.log("\n================= FIND BY ID =================\n");
-
-const product1 = productRepo.findById(1);
-console.log(`Found: ${product1.name} (${product1.sku})`);
-
-// Test NotFoundError
+// Test invalid login
 try {
-  productRepo.findById(999);
+  authService.login("admin", "wrongpassword");
 } catch (err) {
-  if (err instanceof NotFoundError) {
-    console.log(`NotFoundError (expected): ${err.message}`);
+  if (err instanceof ValidationError) {
+    console.log(`Login error (expected): ${err.message}`);
   }
 }
 
-// ================= TEST CREATE =================
-console.log("\n================= CREATE PRODUCT =================\n");
+//  ================= TEST PRODUCT SERVICE =================
+console.log("\n================= PRODUCT SERVICE =================\n");
 
-const newProduct = productRepo.create({
-  sku: "FD004",
-  name: "Soto Ayam",
-  categoryId: 1,
-  price: 18_000,
-  stock: 20,
-  description: "Soto Ayam kampung",
-});
-console.log(`Created: ${newProduct.name} (ID: ${newProduct.id})`);
+const allProducts = productService.getAllProducts();
+console.log(`Products available: ${allProducts.length}`);
 
-// Test ValidationError duplicate SKU
+// Create product via service (with business validation)
 try {
-  productRepo.create({
-    sku: "FD001", // SKU sudah ada!
-    name: "Duplicate",
-    categoryId: 1,
-    price: 10_000,
-    stock: 10,
+  const newProduct = productService.createProduct({
+    sku: "BV004",
+    name: "Jus Alpukat",
+    categoryId: 2,
+    price: 12_000,
+    stock: 15,
   });
+  console.log(`Created: ${newProduct.name}`);
 } catch (err) {
-  if (err instanceof ValidationError) {
-    console.log(`ValidationError (expected): ${err.message}`);
-  }
+  console.log(`Create error: ${(err as Error).message}`);
 }
 
-// ================= TEST UPDATE =================
-console.log("\n================= UPDATE PRODUCT =================\n");
-
-const updated = productRepo.update(1, {
-  price: 17_000,
-  name: "Nasi Goreng Spesial",
-});
-console.log(
-  `Updated: ${updated.name} - Rp ${updated.price.toLocaleString("id-ID")}`,
-);
-
-// ================= TEST SEARCH =================
-console.log("\n================= SEARCH =================\n");
-
-const searchResults = productRepo.search("goreng");
-console.log(`Search 'goreng': ${searchResults.length} results`);
-for (const p of searchResults) {
-  console.log(`${p.sku} - ${p.name}`);
-}
-
-// ================= TEST LOW STOCK =================
-console.log("\n================= LOW STOCK =================\n");
-
-const lowStock = productRepo.findLowStock();
-console.log(`Low stock products: ${lowStock.length}`);
+// Low stock
+const lowStock = productService.getLowStockProducts();
+console.log(`\nLow stock: ${lowStock.length} products\n`);
 for (const p of lowStock) {
-  console.log(`⚠️  ${p.name}: ${p.stock} remaining`);
+  console.log(`- ${p.name}: ${p.stock} remaining`);
 }
 
-// ================= TEST UPDATE STOCK =================
-console.log("\n================= UPDATE STOCK =================\n");
+//  ================= TEST CHECKOUT FLOW =================
+console.log("\n================= CHECKOUT FLOW =================\n");
 
-const before = productRepo.findById(1);
-console.log(`Before: ${before.name} stock = ${before.stock}`);
+const currentUser = authService.getCurrentUser()!;
 
-productRepo.updateStock(1, -5); // Kurangi 5
-const after = productRepo.findById(1);
-console.log(`After reduce 5: ${after.name} stock = ${after.stock}`);
-
-// Test stok tidak cukup
+// Checkout #1: Cash Payment
+console.log("--- Checkout #1: Cash ---");
 try {
-  productRepo.updateStock(7, -100); // Chitato stok hanya 3
+  const cart1 = [
+    { productId: 1, quantity: 2 }, // Nasi Goreng x2
+    { productId: 4, quantity: 3 }, // Teh Botol x3
+  ];
+  const strategy1 = PaymentFactory.create({
+    method: "CASH",
+    cashReceived: 50_000,
+  });
+  const trx1 = transactionService.checkout(currentUser.id, cart1, strategy1);
+  console.log(transactionService.generateReceipt(trx1));
 } catch (err) {
-  if (err instanceof ValidationError) {
-    console.log(`ValidationError (expected): ${err.message}`);
-  }
+  console.log(`Checkout error: ${(err as Error).message}`);
 }
 
-// ================= TEST DELETE (SOFT) =================
-console.log("\n================= SOFT DELETE =================\n");
-
-productRepo.delete(newProduct.id);
-const afterDelete = productRepo.findAll();
-console.log(`Products after soft delete: ${afterDelete.length}`);
-
-// ================= TAKE HOME TASK =================
-
-// ================= TEST CATEGORY =================
-console.log("\n================= CATEGORY REPOSITORY =================\n");
-
-// FIND ALL
-const categories = categoryRepo.findAll();
-console.log(`Total categories: ${categories.length}`);
-categories.forEach((c) => {
-  console.log(`${c.id}. ${c.name}`);
-});
-
-// FIND BY ID
-const category = categoryRepo.findById(1);
-console.log(`Find ID 1: ${category.name}`);
-
-// NOT FOUND
+// Checkout #2: QRIS Payment
+console.log("\n");
+console.log("--- Checkout #2: QRIS ---");
 try {
-  categoryRepo.findById(999);
+  const cart2 = [
+    { productId: 5, quantity: 1 }, // Kopi Susu x1
+    { productId: 8, quantity: 2 }, // Tango x2
+  ];
+  const strategy2 = PaymentFactory.create({ method: "QRIS" });
+  const trx2 = transactionService.checkout(currentUser.id, cart2, strategy2);
+  console.log(transactionService.generateReceipt(trx2));
 } catch (err) {
-  if (err instanceof NotFoundError) {
-    console.log(`NotFoundError (expected): ${err.message}`);
-  }
+  console.log(`Checkout error: ${(err as Error).message}`);
 }
 
-// CREATE
-const newCategory = categoryRepo.create({
-  name: "Dessert",
-  description: "Menu dessert",
-});
-
-console.log(`Created: ${newCategory.name}`);
-
-// UPDATE
-const updatedCategory = categoryRepo.update(newCategory.id, {
-  name: "Dessert Premium",
-});
-
-console.log(`Updated: ${updatedCategory.name}`);
-
-// DELETE GAGAL (karena masih dipakai)
+// Checkout #3: TRANSFER Payment
+console.log("\n");
+console.log("--- Checkout #3: Transfer ---");
 try {
-  categoryRepo.delete(1);
+  const cart3 = [
+    { productId: 3, quantity: 1 }, // Nasi Uduk x1
+  ];
+  const strategy3 = PaymentFactory.create({
+    method: "TRANSFER",
+    bankName: "BCA",
+  });
+  const trx3 = transactionService.checkout(currentUser.id, cart3, strategy3);
+  console.log(transactionService.generateReceipt(trx3));
 } catch (err) {
-  if (err instanceof ValidationError) {
-    console.log(`ValidationError (expected): ${err.message}`);
-  }
+  console.log(`Checkout error: ${(err as Error).message}`);
 }
 
-// DELETE BERHASIL
-categoryRepo.delete(newCategory.id);
-console.log("Delete category success");
+//  ================= VERIFY STOCK REDUCED =================
+console.log("\n================= VERIFY STOCK =================\n");
 
-// ================= TEST USER =================
-console.log("\n================= USER REPOSITORY =================\n");
+const nasiGoreng = productService.getProductById(1);
+console.log(`Nasi Goreng stock after 2 sold: ${nasiGoreng.stock}`);
+// Should be 48 (50 - 2)
 
-// FIND ALL
-const users = userRepo.findAll();
-console.log(`Total users: ${users.length}`);
-users.forEach((u) => {
-  console.log(`${u.username} (${u.getRole()})`);
-});
+const tehBotol = productService.getProductById(4);
+console.log(`Teh Botol stock after 3 sold: ${tehBotol.stock}`);
+// Should be 97 (100 - 3)
 
-// FIND BY ID
-const admin = userRepo.findById(1);
-console.log(`Find ID 1: ${admin.username}`);
+//  ================= TEST ERROR CASES =================
+console.log("\n================= ERROR CASES =================\n");
 
-// FIND BY USERNAME
-const cashier = userRepo.findByUsername("kasir01");
-console.log(`Find Username: ${cashier.username}`);
-
-// NOT FOUND
+// Cart kosong
 try {
-  userRepo.findById(999);
+  const emptyStrategy = PaymentFactory.create({
+    method: "CASH",
+    cashReceived: 100_000,
+  });
+  transactionService.checkout(currentUser.id, [], emptyStrategy);
 } catch (err) {
-  if (err instanceof NotFoundError) {
-    console.log(`NotFoundError (expected): ${err.message}`);
-  }
+  console.log(`Empty cart (expected): ${(err as Error).message}`);
 }
 
-// CREATE
-const newUser = userRepo.create({
-  username: "tester",
-  password: "123456",
-  full_name: "Testing User",
-  role: "CASHIER",
-});
+// Stok tidak cukup
+try {
+  const cart = [{ productId: 7, quantity: 100 }]; // Chitato stok hanya 3
+  const strategy = PaymentFactory.create({
+    method: "CASH",
+    cashReceived: 1_000_000,
+  });
+  transactionService.checkout(currentUser.id, cart, strategy);
+} catch (err) {
+  console.log(`Insufficient stock (expected): ${(err as Error).message}`);
+}
 
-console.log(`Created: ${newUser.username}`);
-
-// UPDATE
-const updatedUser = userRepo.update(newUser.id, {
-  full_name: "Testing User Updated",
-});
-
-console.log(`Updated: ${updatedUser.fullName} - ${updatedUser.username}`);
+// Uang tidak cukup
+try {
+  const cart = [{ productId: 1, quantity: 5 }]; // 5 x 15000 = 75000
+  const strategy = PaymentFactory.create({
+    method: "CASH",
+    cashReceived: 10_000,
+  });
+  transactionService.checkout(currentUser.id, cart, strategy);
+} catch (err) {
+  console.log(`Insufficient cash (expected): ${(err as Error).message}`);
+}
 
 // ================= CLEANUP =================
 console.log("\n");
