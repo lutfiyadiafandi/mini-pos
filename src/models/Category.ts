@@ -1,5 +1,5 @@
 import { Searchable } from "../interfaces/Searchable";
-import { BaseModel } from "./BaseModel";
+import { BaseModel } from "./BaseModel.js";
 
 export class Category extends BaseModel implements Searchable {
   private _name: string;

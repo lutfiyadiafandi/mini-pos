@@ -9,8 +9,10 @@
     "target": "es2022",
     "module": "nodenext",
     "moduleResolution": "nodenext",
-    "rootDir": "./src",
-    "outDir": "./dist"
+    "rootDir": ".",
+    "outDir": "dist"
   },
-  "include": ["src/**/*"]
+
+  "include": ["src/**/*.ts", "electron/**/*.ts"],
+  "exclude": ["src/renderer.ts", "src/views/**/*"]
 }

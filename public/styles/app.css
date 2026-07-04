@@ -1,0 +1,183 @@
+/* ===============================
+   GLOBAL
+================================= */
+html,
+body {
+  margin: 0;
+  height: 100%;
+}
+
+body {
+  min-height: 100vh;
+}
+
+/* ===============================
+   LAYOUT
+================================= */
+.app-layout {
+  display: grid;
+  grid-template-columns: 250px 1fr;
+  min-height: 100vh;
+}
+
+/* ===============================
+   SIDEBAR
+================================= */
+.sidebar {
+  display: flex;
+  flex-direction: column;
+  padding: 1.5rem 1rem;
+  border-right: 1px solid var(--pico-muted-border-color);
+  background: var(--pico-card-background-color);
+}
+
+.sidebar header {
+  margin-bottom: 2rem;
+}
+
+.sidebar h3 {
+  margin: 0;
+  color: var(--pico-primary);
+}
+
+.sidebar ul {
+  display: flex;
+  flex-direction: column;
+  gap: 0.25rem;
+  padding: 0;
+  margin: 0;
+}
+
+.sidebar li {
+  list-style: none;
+}
+
+.sidebar a {
+  display: block;
+  padding: 0.65rem 1rem;
+  color: var(--pico-color);
+  text-decoration: none;
+  border-radius: var(--pico-border-radius);
+  transition:
+    background-color 0.15s ease,
+    color 0.15s ease;
+}
+
+.sidebar a:hover {
+  background: var(--pico-muted-border-color);
+}
+
+.sidebar a.active {
+  background: var(--pico-primary);
+  color: var(--pico-primary-inverse, #fff);
+  font-weight: 600;
+}
+
+.sidebar footer {
+  margin-top: auto;
+  padding-top: 1rem;
+  border-top: 1px solid var(--pico-muted-border-color);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5rem;
+}
+
+/* ===============================
+   CONTENT
+================================= */
+.content {
+  padding: 2rem;
+  overflow-y: auto;
+}
+
+.content header hgroup p {
+  color: var(--pico-muted-color);
+}
+
+/* ===============================
+   DASHBOARD METRIC CARDS
+   (target langsung ke <article> di dalam .grid, tanpa nambah class baru)
+================================= */
+#main-content .grid > article {
+  text-align: center;
+  border-left: 4px solid var(--pico-primary);
+  transition:
+    box-shadow 0.15s ease,
+    transform 0.15s ease;
+}
+
+#main-content .grid > article:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+  transform: translateY(-2px);
+}
+
+#main-content .grid > article header {
+  font-size: 0.85rem;
+  text-transform: uppercase;
+  letter-spacing: 0.03em;
+  color: var(--pico-muted-color);
+  background: transparent;
+  font-weight: 600;
+}
+
+/* ===============================
+   SEARCH BAR
+================================= */
+.search-bar {
+  margin: 1rem 0 1.5rem;
+}
+
+.search-bar input {
+  max-width: 400px;
+}
+
+/* ===============================
+   TABLE
+================================= */
+table {
+  margin-top: 1rem;
+}
+
+table mark {
+  padding: 0.15em 0.6em;
+  border-radius: 999px;
+  font-size: 0.75rem;
+}
+
+/* ===============================
+   FORM
+================================= */
+details#product-form-container {
+  margin-bottom: 1.5rem;
+}
+
+details#product-form-container summary {
+  font-weight: 600;
+}
+
+form {
+  margin-top: 1rem;
+}
+
+/* ===============================
+   RESPONSIVE
+================================= */
+@media (max-width: 900px) {
+  .app-layout {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar {
+    border-right: none;
+    border-bottom: 1px solid var(--pico-muted-border-color);
+  }
+
+  .sidebar ul {
+    flex-direction: row;
+    flex-wrap: wrap;
+  }
+
+  #main-content .grid {
+    grid-template-columns: 1fr;
+  }
+}

@@ -1,6 +1,6 @@
 import { Displayable } from "../interfaces/Displayable";
 import { Searchable } from "../interfaces/Searchable";
-import { BaseModel } from "./BaseModel";
+import { BaseModel } from "./BaseModel.js";
 
 export class Product extends BaseModel implements Displayable, Searchable {
   private _sku: string;

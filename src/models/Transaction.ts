@@ -1,5 +1,5 @@
-import { BaseModel } from "./BaseModel";
-import { Product } from "./Product";
+import { BaseModel } from "./BaseModel.js";
+import { Product } from "./Product.js";
 
 export interface TransactionDetail {
   productId: number;

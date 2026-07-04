@@ -1,12 +1,13 @@
 {
   "name": "mini-pos",
   "version": "1.0.0",
-  "main": "index.js",
+  "main": "dist/electron/main.js",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
-    "build": "tsc && cp src/database/*.sql dist/database/",
-    "start": "npm run build && node dist/main.js",
-    "dev": "tsc --watch"
+    "build": "tsc -p tsconfig.json && tsc -p tsconfig.renderer.json && cp src/database/*.sql dist/src/database/",
+    "start": "npm run build && electron .",
+    "dev": "tsc --watch",
+    "test:cli": "npm run build && node dist/src/main.js"
   },
   "keywords": [],
   "author": "",
@@ -14,9 +15,11 @@
   "description": "",
   "devDependencies": {
     "@types/better-sqlite3": "^7.6.13",
+    "electron": "^43.0.0",
     "typescript": "^6.0.3"
   },
   "dependencies": {
+    "@picocss/pico": "^2.1.1",
     "better-sqlite3": "^12.11.1"
   }
 }

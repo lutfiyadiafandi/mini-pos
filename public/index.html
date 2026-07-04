@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="id" data-theme="light">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Mini POS System</title>
+    <link rel="stylesheet" href="./styles/pico.min.css" />
+    <link rel="stylesheet" href="./styles/pico.colors.min.css" />
+    <link rel="stylesheet" href="./styles/app.css" />
+  </head>
+  <body>
+    <div class="app-layout">
+      <!-- Sidebar Navigation -->
+      <nav class="sidebar">
+        <header>
+          <h3>Mini POS</h3>
+        </header>
+        <ul>
+          <li>
+            <a href="#" data-page="dashboard" class="active">Dashboard</a>
+          </li>
+          <li>
+            <a href="#" data-page="products">Produk</a>
+          </li>
+          <li>
+            <a href="#" data-page="categories">Kategori</a>
+          </li>
+          <li>
+            <a href="#" data-page="transactions">Transaksi</a>
+          </li>
+          <li>
+            <a href="#" data-page="reports">Laporan</a>
+          </li>
+        </ul>
+        <footer>
+          <small id="user-info">Kasir: -</small>
+          <a href="#" id="btn-logout">Logout</a>
+        </footer>
+      </nav>
+
+      <!-- Main Content Area -->
+      <main class="content" id="main-content">
+        <!-- Konten halaman di-render secara dinamis disini -->
+      </main>
+    </div>
+
+    <script type="module" src="../src/renderer.js"></script>
+  </body>
+</html>

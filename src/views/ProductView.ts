@@ -1,0 +1,186 @@
+import { Product } from "../models/Product.js";
+import { Category } from "../models/Category.js";
+
+/**
+ * Product View class yang meng-encapsulate semua DOM manipulation
+ * untuk halaman manajemen produk.
+ *
+ * Prinsip: View HANYA bertanggung jawab untuk rendering dan event capturing
+ * View TIDAK melakukan business logic atau data access.
+ */
+export class ProductView {
+  private tableBody: HTMLTableSectionElement;
+  private form: HTMLFormElement;
+  private searchInput: HTMLInputElement;
+  private categorySelect: HTMLSelectElement;
+  private messageDiv: HTMLElement;
+
+  // Callback functions diberikan oleh Controller (akan dibuat di P09)
+  private onSave: (data: any) => void;
+  private onDelete: (id: number) => void;
+  private onSearch: (keyword: string) => void;
+
+  constructor(
+    onSave: (data: any) => void,
+    onDelete: (id: number) => void,
+    onSearch: (keyword: string) => void,
+  ) {
+    this.onSave = onSave;
+    this.onDelete = onDelete;
+    this.onSearch = onSearch;
+
+    // Ambil referensi ke DOM elements
+    this.tableBody = document.querySelector("#product-table-body")!;
+    this.form = document.querySelector("#product-form")!;
+    this.searchInput = document.querySelector("#product-search")!;
+    this.categorySelect = document.querySelector("#category-select")!;
+    this.messageDiv = document.querySelector("#product-message")!;
+
+    // Bind events
+    this.form.addEventListener("submit", (e) => this.handleSubmit(e));
+    this.searchInput.addEventListener("input", () => {
+      this.onSearch(this.searchInput.value);
+    });
+  }
+
+  /**
+   * Render daftar produk ke tabel.
+   */
+  renderProducts(products: Product[]): void {
+    if (products.length === 0) {
+      this.tableBody.innerHTML = `
+        <tr>
+            <td colspan="6" style="text-align: center;">
+                Tidak ada produk ditemukan
+            </td>
+        </tr>
+        `;
+      return;
+    }
+
+    this.tableBody.innerHTML = products
+      .map(
+        (p) => `
+        <tr>
+            <td><code>${this.escapeHtml(p.sku)}</code></td>
+            <td>${this.escapeHtml(p.name)}</td>
+            <td>#${p.categoryId}</td>
+            <td>Rp ${p.price.toLocaleString("id-ID")}</td>
+            <td>
+                ${p.stock}
+                ${p.isLowStock ? "<mark>LOW</mark>" : ""}
+            </td>
+            <td>
+                <div class="grid" style="gap: 0.5rem; ">
+                    <button class="btn-edit outline pico-background-green-500 pico-color-green-600" data-id="${p.id}">
+                        Edit
+                    </button>
+                    <button class="btn-delete outline pico-background-red-500 pico-color-red-600" data-id="${p.id}">
+                        Hapus
+                    </button>
+                </div>
+            </td>
+        </tr>
+        `,
+      )
+      .join("");
+
+    this.bindRowEvents();
+  }
+
+  /**
+   * Render options kategori di dropdown form.
+   */
+  renderCategories(categories: Category[]): void {
+    const options = categories.map(
+      (c) => `
+        <option value="${c.id}">${this.escapeHtml(c.name)}</option>
+        `,
+    );
+
+    this.categorySelect.innerHTML =
+      `<option value="">-- Pilih Kategori --</option>` + options.join("");
+  }
+
+  /**
+   * Tampilkan pesan success
+   */
+  showSuccess(message: string): void {
+    this.messageDiv.textContent = message;
+    this.messageDiv.style.display = "block";
+    this.messageDiv.className = "";
+    this.messageDiv.setAttribute("role", "alert");
+
+    // Auto-hide setelah 3 detik
+    setTimeout(() => {
+      this.messageDiv.style.display = "none";
+    }, 3_000);
+  }
+
+  /**
+   * Tampilkan pesan error
+   */
+  showError(message: string): void {
+    this.messageDiv.textContent = message;
+    this.messageDiv.style.display = "block";
+    this.messageDiv.style.color = "var(--pico-color-red-500, red)";
+
+    // Auto-hide setelah 5 detik
+    setTimeout(() => {
+      this.messageDiv.style.display = "none";
+      this.messageDiv.style.color = "";
+    }, 5_000);
+  }
+
+  /**
+   * Reset form setelah submit
+   */
+  resetForm(): void {
+    this.form.reset();
+  }
+
+  // =========================== PRIVATE METHODS ===========================
+
+  private handleSubmit(e: Event): void {
+    e.preventDefault();
+    const formData = new FormData(this.form);
+
+    this.onSave({
+      sku: formData.get("sku") as string,
+      name: formData.get("name") as string,
+      categoryId: Number(formData.get("categoryId")),
+      price: Number(formData.get("price")),
+      stock: Number(formData.get("stock")),
+      description: (formData.get("description") as string) ?? "",
+    });
+  }
+
+  private bindRowEvents(): void {
+    // Bind delete buttons
+    this.tableBody.querySelectorAll(".btn-delete").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        const id = Number((e.target as HTMLElement).dataset.id);
+        if (confirm("Yakin hapus produk ini?")) {
+          this.onDelete(id);
+        }
+      });
+    });
+
+    // Bind edit buttons (placeholder full implementation di P09)
+    this.tableBody.querySelectorAll(".btn-edit").forEach((btn) => {
+      btn.addEventListener("click", (e) => {
+        const id = Number((e.target as HTMLElement).dataset.id);
+        alert(`Edit produk #${id} akan diimplementasikan di Praktikum 9`);
+      });
+    });
+  }
+
+  /**
+   * Escape HTML untuk mencegah XSS.
+   */
+  private escapeHtml(text: string): string {
+    const div = document.createElement("div");
+    div.textContent = text;
+    return div.innerHTML;
+  }
+}

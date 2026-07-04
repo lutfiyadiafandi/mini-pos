@@ -1,0 +1,62 @@
+<section>
+  <header>
+    <hgroup>
+      <h2>Manajemen Kategori</h2>
+      <p>Kelola data kategori Mini POS</p>
+    </hgroup>
+  </header>
+
+  <!-- Search & Filter -->
+  <div class="search-bar">
+    <input
+      type="search"
+      id="category-search"
+      placeholder="Cari kategori (nama)"
+    />
+  </div>
+
+  <!-- Category Form (Add/Edit) -->
+  <details id="category-form-container">
+    <summary role="button" class="outline">Tambah Kategori Baru</summary>
+    <form id="category-form">
+      <div class="grid">
+        <label>
+          Nama Kategori *
+          <input type="text" name="name" required placeholder="Nama Kategori" />
+        </label>
+        <label>
+          Deskripsi
+          <textarea
+            name="description"
+            placeholder="Deskripsi Kategori"
+          ></textarea>
+        </label>
+      </div>
+      <div class="grid">
+        <button type="submit">Simpan</button>
+        <button type="reset" class="outline">Reset</button>
+      </div>
+    </form>
+  </details>
+
+  <!-- Error/Success Message -->
+  <div id="category-message" role="alert" style="display: none"></div>
+
+  <!-- Category Table -->
+  <figure>
+    <table role="grid">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Nama</th>
+          <th>Deskripsi</th>
+          <th>Jumlah Produk</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="category-table-body">
+        <!-- Rows di-render oleh CategoryView -->
+      </tbody>
+    </table>
+  </figure>
+</section>

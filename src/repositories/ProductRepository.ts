@@ -89,7 +89,6 @@ export class ProductRepository {
         throw new ValidationError(`SKU ${data.sku} sudah digunakan`);
       }
       if (err.code === "SQLITE_CONSTRAINT_FOREIGNKEY") {
-        // Belum selesai
         throw new ValidationError(
           `Category ID ${data.categoryId} tidak ditemukan`,
         );
@@ -151,7 +150,6 @@ export class ProductRepository {
     this.findById(id);
 
     this.db
-      // Belum selesai
       .prepare(
         "UPDATE products SET is_active = 0, updated_at = datetime('now') WHERE id = ? AND is_active = 1",
       )
@@ -179,7 +177,6 @@ export class ProductRepository {
    */
   findByCategory(categoryId: number): Product[] {
     const rows = this.db
-      // Belum selesai
       .prepare("SELECT * FROM products WHERE category_id = ? AND is_active = 1")
       .all(categoryId) as any[];
 
@@ -191,7 +188,6 @@ export class ProductRepository {
    */
   findLowStock(threshold: number = 5): Product[] {
     const rows = this.db
-      // belum selesai
       .prepare(
         "SELECT * FROM products WHERE stock < ? AND is_active = 1 ORDER BY stock",
       )
@@ -214,7 +210,6 @@ export class ProductRepository {
       );
     }
     this.db
-      // belum selesai
       .prepare(
         "UPDATE products SET stock = ?, updated_at = datetime('now') WHERE id = ?",
       )

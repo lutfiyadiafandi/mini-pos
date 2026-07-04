@@ -1,0 +1,13 @@
+{
+  "compilerOptions": {
+    "target": "ES2022",
+    "module": "ES2022",
+    "moduleResolution": "Bundler",
+    "strict": true,
+    "rootDir": "src",
+    "outDir": "dist/src",
+    "skipLibCheck": true
+  },
+
+  "include": ["src/renderer.ts", "src/views/**/*.ts", "src/models/**/*.ts"]
+}

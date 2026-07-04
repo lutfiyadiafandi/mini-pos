@@ -1,0 +1,92 @@
+<section>
+  <header>
+    <hgroup>
+      <h2>Manajemen Produk</h2>
+      <p>Kelola data produk Mini POS</p>
+    </hgroup>
+  </header>
+
+  <!-- Search & Filter -->
+  <div class="search-bar">
+    <input
+      type="search"
+      id="product-search"
+      placeholder="Cari produk (nama atau SKU)"
+    />
+  </div>
+
+  <!-- Product Form (Add/Edit) -->
+  <details id="product-form-container">
+    <summary role="button" class="outline">Tambah Produk Baru</summary>
+    <form id="product-form">
+      <div class="grid">
+        <label>
+          SKU *
+          <input type="text" name="sku" required placeholder="Contoh: FD001" />
+        </label>
+        <label>
+          Nama Produk *
+          <input type="text" name="name" required placeholder="Nama Produk" />
+        </label>
+      </div>
+      <div class="grid">
+        <label>
+          Kategori *
+          <select name="categoryId" id="category-select" required>
+            <option value="">-- Pilih Kategori --</option>
+          </select>
+        </label>
+        <label>
+          Harga (Rp) *
+          <input
+            type="number"
+            name="price"
+            required
+            min="1"
+            placeholder="Harga Produk"
+          />
+        </label>
+        <label>
+          Stok *
+          <input
+            type="number"
+            name="stock"
+            required
+            min="0"
+            placeholder="Stok Produk"
+          />
+        </label>
+      </div>
+      <label>
+        Deskripsi
+        <textarea name="description" placeholder="Deskripsi Produk"></textarea>
+      </label>
+      <div class="grid">
+        <button type="submit">Simpan</button>
+        <button type="reset" class="outline">Reset</button>
+      </div>
+    </form>
+  </details>
+
+  <!-- Error/Success Message -->
+  <div id="product-message" role="alert" style="display: none"></div>
+
+  <!-- Product Table -->
+  <figure>
+    <table role="grid">
+      <thead>
+        <tr>
+          <th>SKU</th>
+          <th>Nama</th>
+          <th>Kategori</th>
+          <th>Harga</th>
+          <th>Stok</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="product-table-body">
+        <!-- Rows di-render oleh ProductView -->
+      </tbody>
+    </table>
+  </figure>
+</section>
