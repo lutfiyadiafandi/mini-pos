@@ -1,8 +1,7 @@
-import { DashboardView } from "./views/DashboardView.js";
-import { ProductView } from "./views/ProductView.js";
 import { CategoryView } from "./views/CategoryView.js";
-import { Product } from "./models/Product.js";
 import { Category } from "./models/Category.js";
+import { ProductController } from "./controllers/ProductController.js";
+import { DashboardController } from "./controllers/DashboardController.js";
 
 // =====================================================================
 // SAMPLE DATA
@@ -12,19 +11,11 @@ import { Category } from "./models/Category.js";
 // data akan berasal dari Controller melalui IPC.
 // =====================================================================
 
+// Data kategori masih dummy sementara dan di praktikum 10 akan dinamis
 const categories: Category[] = [
   new Category(1, "Makanan"),
   new Category(2, "Minuman"),
   new Category(3, "Snack"),
-];
-
-const products: Product[] = [
-  new Product(1, "FD001", "Nasi Goreng", 15000, 50, 1),
-  new Product(2, "FD002", "Mie Goreng", 12000, 40, 1),
-  new Product(3, "BV001", "Teh Botol", 5000, 100, 2),
-  new Product(4, "BV002", "Kopi Susu", 8000, 80, 2),
-  new Product(5, "SN001", "Chitato", 10000, 3, 3),
-  new Product(6, "HH001", "Sabun Cuci", 12000, 2, 5),
 ];
 
 // =====================================================================
@@ -33,42 +24,11 @@ const products: Product[] = [
 // =====================================================================
 
 const pageInitializers: Record<string, () => void> = {
-  dashboard: () => {
-    const dashboard = new DashboardView();
-    dashboard.renderMetrics({
-      revenue: 245000,
-      trxCount: 8,
-      lowStockCount: products.filter((p) => p.isLowStock).length,
-    });
-
-    dashboard.renderLowStockTable(products.filter((p) => p.isLowStock));
-  },
+  dashboard: () => new DashboardController(),
 
   products: () => {
-    const productView = new ProductView(
-      (data) => {
-        console.log("Save :", data);
-        alert(`Produk "${data.name}" berhasil disimpan (simulasi)`);
-      },
-
-      (id) => {
-        console.log("Delete :", id);
-        alert(`Delete produk ${id} (simulasi)`);
-      },
-
-      (keyword) => {
-        const filtered = products.filter(
-          (p) =>
-            p.name.toLowerCase().includes(keyword.toLowerCase()) ||
-            p.sku.toLowerCase().includes(keyword.toLowerCase()),
-        );
-
-        productView.renderProducts(filtered);
-      },
-    );
-
-    productView.renderCategories(categories);
-    productView.renderProducts(products);
+    const productController = new ProductController();
+    productController.renderCategories(categories); // sementara dummy
   },
 
   categories: () => {
@@ -88,11 +48,11 @@ const pageInitializers: Record<string, () => void> = {
           category.name.toLowerCase().includes(keyword.toLowerCase()),
         );
 
-        categoryView.renderCategories(filtered, products);
+        categoryView.renderCategories(filtered, []);
       },
     );
 
-    categoryView.renderCategories(categories, products);
+    categoryView.renderCategories(categories, []);
   },
 };
 

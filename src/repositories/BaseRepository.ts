@@ -1,4 +1,4 @@
-import { BaseModel } from "../models/BaseModel";
+import { BaseModel } from "../models/BaseModel.js";
 
 export abstract class BaseRepository<T extends BaseModel> {
   protected items: T[] = [];

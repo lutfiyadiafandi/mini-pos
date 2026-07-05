@@ -5,9 +5,9 @@
     "moduleResolution": "Bundler",
     "strict": true,
     "rootDir": "src",
-    "outDir": "dist/src",
+    "outDir": "dist/renderer",
     "skipLibCheck": true
   },
 
-  "include": ["src/renderer.ts", "src/views/**/*.ts", "src/models/**/*.ts"]
+  "include": ["src/renderer.ts", "src/views/**/*.ts"]
 }

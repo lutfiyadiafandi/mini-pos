@@ -14,5 +14,5 @@
   },
 
   "include": ["src/**/*.ts", "electron/**/*.ts"],
-  "exclude": ["src/renderer.ts", "src/views/**/*"]
+  "exclude": ["src/renderer.ts", "src/views/**/*.ts"]
 }
