@@ -1,8 +1,11 @@
-import { PaymentConfig, PaymentStrategy } from "../interfaces/PaymentStrategy";
-import { CashPayment } from "./CashPayment";
-import { CreditCardPayment } from "./CreditCardPayment";
-import { QRISPayment } from "./QRISPayment";
-import { TransferPayment } from "./TransferPayment";
+import {
+  PaymentConfig,
+  PaymentStrategy,
+} from "../interfaces/PaymentStrategy.js";
+import { CashPayment } from "./CashPayment.js";
+import { CreditCardPayment } from "./CreditCardPayment.js";
+import { QRISPayment } from "./QRISPayment.js";
+import { TransferPayment } from "./TransferPayment.js";
 
 export class PaymentFactory {
   static create(config: PaymentConfig): PaymentStrategy {

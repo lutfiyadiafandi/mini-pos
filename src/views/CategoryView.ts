@@ -13,19 +13,23 @@ export class CategoryView {
   private form: HTMLFormElement;
   private searchInput: HTMLInputElement;
   private messageDiv: HTMLElement;
+  private formContainer: HTMLDetailsElement;
 
   // Callback functions diberikan oleh Controller (akan dibuat di P09)
   private onSave: (data: any) => void;
   private onDelete: (id: number) => void;
+  private onEdit: (id: number) => void;
   private onSearch: (keyword: string) => void;
 
   constructor(
     onSave: (data: any) => void,
     onDelete: (id: number) => void,
+    onEdit: (id: number) => void,
     onSearch: (keyword: string) => void,
   ) {
     this.onSave = onSave;
     this.onDelete = onDelete;
+    this.onEdit = onEdit;
     this.onSearch = onSearch;
 
     // Ambil referensi ke DOM elements
@@ -33,6 +37,7 @@ export class CategoryView {
     this.form = document.querySelector("#category-form")!;
     this.searchInput = document.querySelector("#category-search")!;
     this.messageDiv = document.querySelector("#category-message")!;
+    this.formContainer = document.querySelector("#category-form-container")!;
 
     // Bind events
     this.form.addEventListener("submit", (e) => this.handleSubmit(e));
@@ -87,6 +92,19 @@ export class CategoryView {
     this.bindRowEvents();
   }
 
+  fillForm(category: any): void {
+    (this.form.elements.namedItem("id") as HTMLInputElement).value = String(
+      category.id,
+    );
+    (this.form.elements.namedItem("name") as HTMLInputElement).value =
+      category.name;
+    (this.form.elements.namedItem("description") as HTMLTextAreaElement).value =
+      category.description;
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    this.formContainer.open = true;
+  }
+
   /**
    * Tampilkan pesan success
    */
@@ -131,6 +149,7 @@ export class CategoryView {
     const formData = new FormData(this.form);
 
     this.onSave({
+      id: Number(formData.get("id")) || undefined,
       name: formData.get("name") as string,
       description: (formData.get("description") as string) ?? "",
     });
@@ -151,7 +170,7 @@ export class CategoryView {
     this.tableBody.querySelectorAll(".btn-edit").forEach((btn) => {
       btn.addEventListener("click", (e) => {
         const id = Number((e.target as HTMLElement).dataset.id);
-        alert(`Edit kategori #${id} akan diimplementasikan di Praktikum 9`);
+        this.onEdit(id);
       });
     });
   }

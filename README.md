@@ -1,6 +1,6 @@
 # MINI-POS
 
-Praktikum 09
+Praktikum 10
 
 By Lutfiyadi Afandi - A18.2024.00157
 
@@ -15,7 +15,14 @@ Langkah-langkah untuk menginstal:
 5. Jalankan `npm run start` untuk menjalankan electron
 6. Pastikan kedua perintah diatas berjalan di terminal yang berbeda secara bersamaan
 
-## Fitur Tambahan
+## Kelengkapan Fitur
 
-1. Melengkapi endpoint transaksi
-2. Membuat Dashboard Controller
+1. Login Screen
+2. Dashboard ✅
+3. Product Management (CRUD) ✅
+4. Category Management (CRUD) ✅
+5. Transaction (Cart -> Payment -> Receipt) ✅
+6. Sales Report (Filter + Table + Export CSV)
+7. User Management
+
+## Fitur Tambahan

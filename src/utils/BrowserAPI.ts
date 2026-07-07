@@ -24,11 +24,61 @@ export class BrowserAPI {
     return this.fetchApi("/products");
   }
 
+  async productGetById(id: number): Promise<any> {
+    return this.fetchApi(`/products/${id}`);
+  }
+
   // Panggil Endpoint Simpan Objek Backend
   async productCreate(data: Record<string, unknown>): Promise<any> {
     return this.fetchApi("/products", {
       method: "POST",
       body: JSON.stringify(data),
+    });
+  }
+
+  async productUpdate(id: number, data: Record<string, unknown>): Promise<any> {
+    return this.fetchApi(`/products/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    });
+  }
+
+  async productDelete(id: number): Promise<any> {
+    return this.fetchApi(`/products/${id}`, {
+      method: "DELETE",
+    });
+  }
+
+  // ======= API Kategori ========
+  async categoryGetAll(): Promise<any> {
+    return this.fetchApi("/categories");
+  }
+
+  async categoryGetById(id: number): Promise<any> {
+    return this.fetchApi(`/categories/${id}`);
+  }
+
+  // Panggil Endpoint Simpan Objek Backend
+  async categoryCreate(data: Record<string, unknown>): Promise<any> {
+    return this.fetchApi("/categories", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  async categoryUpdate(
+    id: number,
+    data: Record<string, unknown>,
+  ): Promise<any> {
+    return this.fetchApi(`/categories/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    });
+  }
+
+  async categoriesDelete(id: number): Promise<any> {
+    return this.fetchApi(`/categories/${id}`, {
+      method: "DELETE",
     });
   }
 

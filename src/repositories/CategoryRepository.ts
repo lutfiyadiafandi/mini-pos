@@ -98,7 +98,7 @@ export class CategoryRepository {
     this.findById(id);
 
     const rows = this.db
-      .prepare("SELECT * FROM products WHERE category_id = ? AND is_active = 1")
+      .prepare("SELECT * FROM products WHERE category_id = ?")
       .all(id) as any[];
 
     if (rows.length > 0) {
@@ -108,6 +108,21 @@ export class CategoryRepository {
     }
 
     this.db.prepare("DELETE FROM categories WHERE id = ?").run(id);
+  }
+
+  /**
+   * Search kategori berdasarkan nama
+   */
+  search(keyword: string): Category[] {
+    const rows = this.db
+      .prepare(
+        `SELECT * FROM categories
+           WHERE (name LIKE ?)
+           ORDER BY name`,
+      )
+      .all(`%${keyword}%`, `%${keyword}%`) as any[];
+
+    return rows.map((row) => this.mapToCategory(row));
   }
 
   /**

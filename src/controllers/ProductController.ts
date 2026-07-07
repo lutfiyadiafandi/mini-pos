@@ -1,6 +1,5 @@
 import { ProductView } from "../views/ProductView.js";
 import { BrowserAPI } from "../utils/BrowserAPI.js";
-import { Category } from "../models/Category.js";
 
 export class ProductController {
   private view: ProductView;
@@ -13,6 +12,7 @@ export class ProductController {
     this.view = new ProductView(
       (data) => this.handleSave(data),
       (id) => this.handleDelete(id),
+      (id) => this.handleEdit(id),
       (keyword) => this.handleSearch(keyword),
       // ... callback lanjutan
     );
@@ -21,6 +21,7 @@ export class ProductController {
 
   private async initialize() {
     await this.loadProducts();
+    await this.loadCategories();
   }
 
   /**
@@ -28,34 +29,63 @@ export class ProductController {
    */
   private async handleSave(data: any): Promise<void> {
     try {
-      const result = await this.api.productCreate(data); // Call Backend
+      let result;
+
+      data.id
+        ? (result = await this.api.productUpdate(data.id, data))
+        : (result = await this.api.productCreate(data));
 
       if (result.success) {
-        this.view.showSuccess(`Produk disimpan ke dalam Sever!`);
+        this.view.showSuccess(
+          data.id ? "Produk berhasil diupdate!" : "Produk berhasil disimpan!",
+        );
         this.view.resetForm();
         await this.loadProducts(); // Panggil ulang tabel baru dari
       } else {
-        this.view.showError("Peladen Merespon Gagal: " + result.error);
+        this.view.showError("Gagal: " + result.error);
       }
     } catch (err) {
-      this.view.showError("Komputer Putus Koneksi Server.");
+      this.view.showError("Tidak bisa terhubung ke server.");
     }
   }
 
   private async handleDelete(id: number): Promise<void> {
-    // Akan diimplementasikan di Praktikum 10
+    try {
+      const result = await this.api.productDelete(id);
+      if (result.success) {
+        this.view.showSuccess(`Produk berhasil dihapus!`);
+        await this.loadProducts();
+      } else {
+        this.view.showError("Gagal hapus: " + result.error);
+      }
+    } catch (error) {
+      this.view.showError("Tidak bisa terhubung ke server.");
+    }
   }
 
   private async handleEdit(id: number): Promise<void> {
-    // Akan diimplementasikan di Praktikum 10
+    try {
+      const result = await this.api.productGetById(id);
+      if (result.success && result.data) {
+        this.view.fillForm(this.mapProduct(result.data));
+      }
+    } catch (err) {
+      this.view.showError("Tidak bisa terhubung ke server.");
+    }
   }
 
   private async handleSearch(keyword: string): Promise<void> {
-    // Akan diimplementasikan di Praktikum 10
-  }
-
-  public renderCategories(categories: Category[]): void {
-    this.view.renderCategories(categories);
+    const result = await this.api.productGetAll();
+    if (result.success && result.data) {
+      const filtered = result.data
+        .map((p: any) => this.mapProduct(p))
+        .filter(
+          (p: any) =>
+            p.name.toLowerCase().includes(keyword.toLowerCase()) ||
+            p.sku.toLowerCase().includes(keyword.toLowerCase()),
+        );
+      this.view.renderProducts(filtered);
+    }
   }
 
   async loadProducts(): Promise<void> {
@@ -68,6 +98,17 @@ export class ProductController {
       }
     } catch (err) {
       console.error("Gagal load products:", err);
+    }
+  }
+
+  async loadCategories(): Promise<void> {
+    const result = await this.api.categoryGetAll();
+    if (result.success && result.data) {
+      const categories = result.data.map((category: any) => ({
+        id: category._id,
+        name: category._name,
+      }));
+      this.view.renderCategories(categories);
     }
   }
 

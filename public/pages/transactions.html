@@ -1,0 +1,66 @@
+<section>
+  <header>
+    <hgroup>
+      <h2>Transaksi Penjualan</h2>
+      <p>Pilih produk dan proses transaksi pelanggan</p>
+    </hgroup>
+  </header>
+
+  <!-- Search & Filter -->
+  <div class="search-bar">
+    <input
+      type="search"
+      id="trx-product-search"
+      placeholder="Cari produk (nama atau SKU)"
+    />
+  </div>
+
+  <div id="transaction-message" role="alert" style="display: none"></div>
+
+  <div class="transaction-layout">
+    <!-- Data Produk -->
+    <section class="transaction-products">
+      <figure>
+        <table role="grid">
+          <thead>
+            <tr>
+              <th>SKU</th>
+              <th>Nama</th>
+              <th>Harga</th>
+              <th>Stok</th>
+              <th></th>
+            </tr>
+          </thead>
+
+          <tbody id="transaction-product-table">
+            <!-- Render Product -->
+          </tbody>
+        </table>
+      </figure>
+    </section>
+
+    <!-- Keranjang -->
+    <aside class="cart-panel">
+      <article>
+        <header>
+          <strong>Keranjang</strong>
+        </header>
+
+        <div id="cart-items"></div>
+        <hr />
+        <div class="cart-summary">
+          <p>
+            <strong>Total Item</strong>
+            <span id="cart-total-item"> 0 </span>
+          </p>
+          <p>
+            <strong>Total Harga</strong>
+            <span id="cart-total-price"> Rp 0 </span>
+          </p>
+        </div>
+
+        <button id="btn-process-transaction">Proses Transaksi</button>
+      </article>
+    </aside>
+  </div>
+</section>

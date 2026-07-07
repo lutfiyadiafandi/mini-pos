@@ -1,22 +1,7 @@
-import { CategoryView } from "./views/CategoryView.js";
-import { Category } from "./models/Category.js";
 import { ProductController } from "./controllers/ProductController.js";
+import { CategoryController } from "./controllers/CategoryController.js";
 import { DashboardController } from "./controllers/DashboardController.js";
-
-// =====================================================================
-// SAMPLE DATA
-// Praktikum 08:
-// sementara memakai data dummy.
-// Praktikum 09:
-// data akan berasal dari Controller melalui IPC.
-// =====================================================================
-
-// Data kategori masih dummy sementara dan di praktikum 10 akan dinamis
-const categories: Category[] = [
-  new Category(1, "Makanan"),
-  new Category(2, "Minuman"),
-  new Category(3, "Snack"),
-];
+import { TransactionController } from "./controllers/TransactionController.js";
 
 // =====================================================================
 // PAGE INITIALIZER
@@ -26,34 +11,11 @@ const categories: Category[] = [
 const pageInitializers: Record<string, () => void> = {
   dashboard: () => new DashboardController(),
 
-  products: () => {
-    const productController = new ProductController();
-    productController.renderCategories(categories); // sementara dummy
-  },
+  products: () => new ProductController(),
 
-  categories: () => {
-    const categoryView = new CategoryView(
-      (data) => {
-        console.log("Save category", data);
-        alert(`Kategori "${data.name}" berhasil disimpan (simulasi)`);
-      },
+  categories: () => new CategoryController(),
 
-      (id) => {
-        console.log("Delete category", id);
-        alert(`Kategori #${id} dihapus (simulasi)`);
-      },
-
-      (keyword) => {
-        const filtered = categories.filter((category) =>
-          category.name.toLowerCase().includes(keyword.toLowerCase()),
-        );
-
-        categoryView.renderCategories(filtered, []);
-      },
-    );
-
-    categoryView.renderCategories(categories, []);
-  },
+  transactions: () => new TransactionController(),
 };
 
 // =====================================================================

@@ -6,6 +6,7 @@ import { ProductRepository } from "./repositories/ProductRepository.js";
 import { CategoryRepository } from "./repositories/CategoryRepository.js";
 import { TransactionRepository } from "./repositories/TransactionRepository.js";
 import { ProductService } from "./services/ProductService.js";
+import { CategoryService } from "./services/CategoryService.js";
 import { TransactionService } from "./services/TransactionService.js";
 import { PaymentFactory } from "./strategies/PaymentFactory.js";
 
@@ -19,6 +20,8 @@ const db = DatabaseConnection.getInstance();
 const productRepo = new ProductRepository();
 const categoryRepo = new CategoryRepository();
 const transactionRepo = new TransactionRepository();
+
+const categoryService = new CategoryService(categoryRepo);
 const productService = new ProductService(productRepo, categoryRepo);
 const transactionService = new TransactionService(transactionRepo, productRepo);
 
@@ -29,9 +32,20 @@ const transactionService = new TransactionService(transactionRepo, productRepo);
 app.get("/api/products", (req: Request, res: Response) => {
   try {
     const result = productService.getAllProducts(); // Logic PBO
-    return res.json({ success: true, data: result });
+    return res.status(200).json({ success: true, data: result });
   } catch (error) {
-    return res.status(500).json({ success: false, error: String(error) });
+    return res.status(404).json({ success: false, error: String(error) });
+  }
+});
+
+// API untuk mendapatkan produk berdasarkan ID
+app.get("/api/products/:id", (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    const result = productService.getProductById(id); // Logic PBO();
+    return res.status(200).json({ success: true, data: result });
+  } catch (error) {
+    return res.status(404).json({ success: false, error: String(error) });
   }
 });
 
@@ -45,7 +59,83 @@ app.post("/api/products", (req: Request, res: Response) => {
   }
 });
 
-// ======== API Dasboard =========
+// API untuk memperbarui produk
+app.patch("/api/products/:id", (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    const result = productService.updateProduct(id, req.body); // req.body dengan method PATCH
+    return res.status(200).json({ success: true, data: result });
+  } catch (error) {
+    return res.status(400).json({ success: false, error: String(error) });
+  }
+});
+
+// API untuk menghapus produk
+app.delete("/api/products/:id", (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    const result = productService.deleteProduct(id); // req.body dengan method DELETE
+    return res.status(200).json({ success: true, data: result });
+  } catch (error) {
+    return res.status(400).json({ success: false, error: String(error) });
+  }
+});
+
+// ======== API Categories =========
+// API untuk mendapatkan seluruh kategori
+app.get("/api/categories", (req: Request, res: Response) => {
+  try {
+    const result = categoryService.getAllCategories(); // Logic PBO
+    return res.status(200).json({ success: true, data: result });
+  } catch (error) {
+    return res.status(404).json({ success: false, error: String(error) });
+  }
+});
+
+// API untuk mendapatkan kategori berdasarkan ID
+app.get("/api/categories/:id", (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    const result = categoryService.getCategoryById(id); // Logic PBO();
+    return res.status(200).json({ success: true, data: result });
+  } catch (error) {
+    return res.status(404).json({ success: false, error: String(error) });
+  }
+});
+
+// API untuk menyimpan kategori baru (Dari Form HTML)
+app.post("/api/categories", (req: Request, res: Response) => {
+  try {
+    const result = categoryService.createCategory(req.body); // req.body dengan method POST
+    return res.status(201).json({ success: true, data: result });
+  } catch (error) {
+    return res.status(400).json({ success: false, error: String(error) });
+  }
+});
+
+// API untuk memperbarui kategori
+app.patch("/api/categories/:id", (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    const result = categoryService.updateCategory(id, req.body); // req.body dengan method PATCH
+    return res.status(200).json({ success: true, data: result });
+  } catch (error) {
+    return res.status(400).json({ success: false, error: String(error) });
+  }
+});
+
+// API untuk menghapus kategori
+app.delete("/api/categories/:id", (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    const result = categoryService.deleteCategory(id); // req.body dengan method DELETE
+    return res.status(200).json({ success: true, data: result });
+  } catch (error) {
+    return res.status(400).json({ success: false, error: String(error) });
+  }
+});
+
+// ======== API Transactions =========
 // API untuk mendapatkan seluruh transaksi
 app.get("/api/transactions", (req: Request, res: Response) => {
   try {
@@ -68,6 +158,7 @@ app.post("/api/transactions/process", (req: Request, res: Response) => {
   }
 });
 
+// ======== API Dasboard =========
 // API untuk mendapatkan data pada dashboard
 app.get("/api/reports", (req: Request, res: Response) => {
   try {

@@ -14,19 +14,23 @@ export class ProductView {
   private searchInput: HTMLInputElement;
   private categorySelect: HTMLSelectElement;
   private messageDiv: HTMLElement;
+  private formContainer: HTMLDetailsElement;
 
   // Callback functions diberikan oleh Controller (akan dibuat di P09)
   private onSave: (data: any) => void;
   private onDelete: (id: number) => void;
+  private onEdit: (id: number) => void;
   private onSearch: (keyword: string) => void;
 
   constructor(
     onSave: (data: any) => void,
     onDelete: (id: number) => void,
+    onEdit: (id: number) => void,
     onSearch: (keyword: string) => void,
   ) {
     this.onSave = onSave;
     this.onDelete = onDelete;
+    this.onEdit = onEdit;
     this.onSearch = onSearch;
 
     // Ambil referensi ke DOM elements
@@ -35,6 +39,7 @@ export class ProductView {
     this.searchInput = document.querySelector("#product-search")!;
     this.categorySelect = document.querySelector("#category-select")!;
     this.messageDiv = document.querySelector("#product-message")!;
+    this.formContainer = document.querySelector("#product-form-container")!;
 
     // Bind events
     this.form.addEventListener("submit", (e) => this.handleSubmit(e));
@@ -102,18 +107,42 @@ export class ProductView {
       `<option value="">-- Pilih Kategori --</option>` + options.join("");
   }
 
+  fillForm(product: any): void {
+    (this.form.elements.namedItem("id") as HTMLInputElement).value = String(
+      product.id,
+    );
+    (this.form.elements.namedItem("sku") as HTMLInputElement).value =
+      product.sku;
+    (this.form.elements.namedItem("name") as HTMLInputElement).value =
+      product.name;
+    (this.form.elements.namedItem("categoryId") as HTMLSelectElement).value =
+      String(product.categoryId);
+    (this.form.elements.namedItem("price") as HTMLInputElement).value = String(
+      product.price,
+    );
+    (this.form.elements.namedItem("stock") as HTMLInputElement).value = String(
+      product.stock,
+    );
+    (this.form.elements.namedItem("description") as HTMLTextAreaElement).value =
+      product.description;
+
+    window.scrollTo({ top: 0, behavior: "smooth" });
+    this.formContainer.open = true;
+  }
+
   /**
    * Tampilkan pesan success
    */
   showSuccess(message: string): void {
     this.messageDiv.textContent = message;
     this.messageDiv.style.display = "block";
-    this.messageDiv.className = "";
+    this.messageDiv.style.color = "var(--pico-color-green-500, green)";
     this.messageDiv.setAttribute("role", "alert");
 
     // Auto-hide setelah 3 detik
     setTimeout(() => {
       this.messageDiv.style.display = "none";
+      this.messageDiv.className = "";
     }, 3_000);
   }
 
@@ -146,6 +175,7 @@ export class ProductView {
     const formData = new FormData(this.form);
 
     this.onSave({
+      id: Number(formData.get("id")) || undefined,
       sku: formData.get("sku") as string,
       name: formData.get("name") as string,
       categoryId: Number(formData.get("categoryId")),
@@ -170,7 +200,7 @@ export class ProductView {
     this.tableBody.querySelectorAll(".btn-edit").forEach((btn) => {
       btn.addEventListener("click", (e) => {
         const id = Number((e.target as HTMLElement).dataset.id);
-        alert(`Edit produk #${id} akan diimplementasikan di Praktikum 9`);
+        this.onEdit(id);
       });
     });
   }
