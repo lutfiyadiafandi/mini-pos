@@ -158,6 +158,20 @@ app.post("/api/transactions/process", (req: Request, res: Response) => {
   }
 });
 
+// API untuk filter transaksi
+app.get("/api/transactions/filter", (req: Request, res: Response) => {
+  try {
+    const { startDate, endDate } = req.query as {
+      startDate: string;
+      endDate: string;
+    };
+    const result = transactionService.getByDateRange(startDate, endDate);
+    return res.json({ success: true, data: result });
+  } catch (error) {
+    return res.status(500).json({ success: false, error: String(error) });
+  }
+});
+
 // ======== API Dasboard =========
 // API untuk mendapatkan data pada dashboard
 app.get("/api/reports", (req: Request, res: Response) => {

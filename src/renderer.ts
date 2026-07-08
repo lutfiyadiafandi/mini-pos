@@ -2,6 +2,7 @@ import { ProductController } from "./controllers/ProductController.js";
 import { CategoryController } from "./controllers/CategoryController.js";
 import { DashboardController } from "./controllers/DashboardController.js";
 import { TransactionController } from "./controllers/TransactionController.js";
+import { ReportController } from "./controllers/ReportController.js";
 
 // =====================================================================
 // PAGE INITIALIZER
@@ -16,6 +17,8 @@ const pageInitializers: Record<string, () => void> = {
   categories: () => new CategoryController(),
 
   transactions: () => new TransactionController(),
+
+  reports: () => new ReportController(),
 };
 
 // =====================================================================

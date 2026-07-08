@@ -1,6 +1,6 @@
 import { PaymentConfig } from "../interfaces/PaymentStrategy.js";
-import { PaymentFactory } from "../strategies/PaymentFactory.js";
 import { QRCodeService } from "../services/QRCodeService.js";
+import { TransferPayment } from "../strategies/TransferPayment.js";
 
 /**
  * Payment Modal modal dialog untuk memilih dan memproses pembayaran.
@@ -39,7 +39,7 @@ export class PaymentModal {
                         <input type="number" id="cash-received" min="${totalAmount}" placeholder="Masukkan jumlah uang" />
                     </label>
                     <p id="cash-change" style="font-weight: bold;"></p>
-                    <button id="btn-pay-cash" class="contrast">Bayar Tunai</button>
+                    <button id="btn-pay-cash">Bayar Tunai</button>
                 </details>
 
                 <!-- QRIS Payment -->
@@ -53,7 +53,7 @@ export class PaymentModal {
                 </details>
 
                 <!-- Transfer Payment -->
-                <details>
+                <details id="details-transfer">
                     <summary>Transfer Bank</summary>
                     <label>
                         Bank
@@ -64,6 +64,11 @@ export class PaymentModal {
                             <option value="MANDIRI">Mandiri</option>
                         </select>
                     </label>
+                    <button id="btn-generate-va" class="secondary">
+                        Generate Virtual Account
+                    </button>
+                    <article id="transfer-va-box" style="display:none; text-align:center; margin-top: 10px; margin-bottom: 10px;">
+                    </article>
                     <button id="btn-pay-transfer">Konfirmasi Transfer</button>
                 </details>
             </div>
@@ -138,6 +143,31 @@ export class PaymentModal {
         onConfirm({
           method: "QRIS",
         });
+      });
+
+    // Generate VA number
+    this.modalEl
+      .querySelector("#btn-generate-va")!
+      .addEventListener("click", () => {
+        const bank = (
+          this.modalEl!.querySelector("#transfer-bank") as HTMLSelectElement
+        ).value;
+        const transfer = new TransferPayment(bank);
+
+        const box = this.modalEl!.querySelector(
+          "#transfer-va-box",
+        ) as HTMLElement;
+
+        box.style.display = "block";
+        box.innerHTML = `
+              <h6>Virtual Account</h6>
+              <p><strong>BANK :</strong> ${transfer.getBankName()}</p>
+              <p><strong>VA :</strong> ${transfer.getVANumber()}</p>
+              <small>
+                  <strong>Total Pembayaran : </strong>
+                  Rp ${totalAmount.toLocaleString("id-ID")}
+              </small>
+        `;
       });
 
     // Transfer

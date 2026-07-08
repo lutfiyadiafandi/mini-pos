@@ -173,7 +173,7 @@ export class SalesReport {
       "Harga Satuan",
       "Subtotal",
       "Total Transaksi",
-    ].join(", ");
+    ].join("; ");
 
     const rows = this.transactions
       .filter((t) => t.status === "SUCCESS")
@@ -189,7 +189,7 @@ export class SalesReport {
             item.price,
             item.subtotal,
             index === 0 ? t.totalAmount : "",
-          ].join(", "),
+          ].join("; "),
         ),
       );
 

@@ -94,6 +94,12 @@ export class BrowserAPI {
     return this.fetchApi("/transactions");
   }
 
+  async transactionFilter(startDate: string, endDate: string): Promise<any> {
+    return this.fetchApi(
+      `/transactions/filter?startDate=${startDate}&endDate=${endDate}`,
+    );
+  }
+
   // ======= API Laporan Dashboard ========
   async reportsGetAll(): Promise<any> {
     return this.fetchApi("/reports");

@@ -1,0 +1,76 @@
+<section>
+  <header>
+    <hgroup>
+      <h2>Laporan Penjualan</h2>
+      <p>Lihat dan export data penjualan</p>
+    </hgroup>
+  </header>
+
+  <!-- Filter -->
+  <div class="grid">
+    <label>
+      Dari Tanggal
+      <input type="date" id="report-start-date" />
+    </label>
+    <label>
+      Sampai Tanggal
+      <input type="date" id="report-end-date" />
+    </label>
+    <label>
+      &nbsp;
+      <button id="btn-filter-report">Filter</button>
+    </label>
+  </div>
+
+  <!-- Summary Cards -->
+  <div class="grid">
+    <article>
+      <header>Total Revenue</header>
+      <p
+        id="report-total-revenue"
+        style="font-size: 1.5rem; font-weight: bold"
+      ></p>
+    </article>
+    <article>
+      <header>Jumlah Transaksi</header>
+      <p id="report-trx-count" style="font-size: 1.5rem; font-weight: bold"></p>
+    </article>
+  </div>
+
+  <!-- Revenue by Method Payment -->
+  <article>
+    <header>Revenue per Metode Pembayaran</header>
+    <table role="grid">
+      <thead>
+        <tr>
+          <th>Metode</th>
+          <th>Jumlah Transaksi</th>
+          <th>Total Revenue</th>
+        </tr>
+      </thead>
+      <tbody id="report-by-method"></tbody>
+    </table>
+  </article>
+
+  <!-- Transaksi Tabel -->
+  <article>
+    <header>
+      Detail Transaksi
+      <button id="btn-export-csv" class="outline" style="float: right">
+        Export CSV
+      </button>
+    </header>
+    <table role="grid">
+      <thead>
+        <tr>
+          <th>Kode</th>
+          <th>Tanggal</th>
+          <th>Payment</th>
+          <th>Total</th>
+          <th>Status</th>
+        </tr>
+      </thead>
+      <tbody id="report-table-body"></tbody>
+    </table>
+  </article>
+</section>

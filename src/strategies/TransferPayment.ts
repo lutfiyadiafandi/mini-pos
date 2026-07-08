@@ -7,6 +7,7 @@ import { PaymentResult, PaymentStrategy } from "../interfaces/PaymentStrategy";
 export class TransferPayment implements PaymentStrategy {
   readonly methodName = "TRANSFER";
   private bankName: string;
+  private vaNumber: string;
 
   private static SUPPORTED_BANKS = ["BCA", "BNI", "BRI", "MANDIRI"];
 
@@ -24,6 +25,7 @@ export class TransferPayment implements PaymentStrategy {
       );
     }
     this.bankName = bankName.toUpperCase();
+    this.vaNumber = this.generateVANumber();
   }
 
   validatePayment(amount: number): boolean {
@@ -40,15 +42,13 @@ export class TransferPayment implements PaymentStrategy {
       };
     }
 
-    // Generate nomor VA dummy
-    const vaNumber = this.generateVANumber();
     const transactionCode = `TRF-${Date.now()}`;
 
     return {
       success: true,
       message:
         `Transfer ${this.bankName} berhasil. ` +
-        `VA: ${vaNumber} | ` +
+        `VA: ${this.vaNumber} | ` +
         `Jumlah: Rp ${amount.toLocaleString("id-ID")}`,
       transactionCode,
     };
@@ -58,15 +58,23 @@ export class TransferPayment implements PaymentStrategy {
     return (
       `Metode Pembayaran: ${this.methodName}. ` +
       `Bank: ${this.bankName}, ` +
-      `VA: ${this.generateVANumber()}`
+      `VA: ${this.vaNumber}`
     );
   }
 
-  private generateVANumber(): string {
+  public generateVANumber(): string {
     const code = TransferPayment.BANK_CODES[this.bankName] ?? "000";
     const random = Math.floor(Math.random() * 10_000_000_000)
       .toString()
       .padStart(10, "0");
     return `${code}${random}`;
+  }
+
+  public getVANumber(): string {
+    return this.vaNumber;
+  }
+
+  public getBankName(): string {
+    return this.bankName;
   }
 }
