@@ -1,0 +1,42 @@
+<section class="login-page">
+  <article class="login-card">
+    <header style="text-align: center">
+      <h2>Mini POS System</h2>
+      <p>Silakan login untuk melanjutkan</p>
+    </header>
+
+    <form id="login-form">
+      <label>
+        Username
+        <input
+          type="text"
+          id="login-username"
+          name="username"
+          autocomplete="username"
+          placeholder="Masukkan username"
+          required
+        />
+      </label>
+
+      <label>
+        Password
+        <input
+          type="password"
+          id="login-password"
+          name="password"
+          autocomplete="current-password"
+          placeholder="Masukkan password"
+          required
+        />
+      </label>
+
+      <div
+        id="login-message"
+        role="alert"
+        style="display: none; margin-bottom: 1rem"
+      ></div>
+
+      <button id="btn-login" type="submit" style="width: 100%">Login</button>
+    </form>
+  </article>
+</section>

@@ -8,6 +8,7 @@ import { TransactionRepository } from "./repositories/TransactionRepository.js";
 import { ProductService } from "./services/ProductService.js";
 import { CategoryService } from "./services/CategoryService.js";
 import { TransactionService } from "./services/TransactionService.js";
+import { AuthService } from "./services/AuthService.js";
 import { PaymentFactory } from "./strategies/PaymentFactory.js";
 
 const app = express();
@@ -24,6 +25,7 @@ const transactionRepo = new TransactionRepository();
 const categoryService = new CategoryService(categoryRepo);
 const productService = new ProductService(productRepo, categoryRepo);
 const transactionService = new TransactionService(transactionRepo, productRepo);
+const authService = new AuthService();
 
 // ======= ENDPOINT ROUTES ======
 
@@ -158,6 +160,7 @@ app.post("/api/transactions/process", (req: Request, res: Response) => {
   }
 });
 
+// ======== API Reports =========
 // API untuk filter transaksi
 app.get("/api/transactions/filter", (req: Request, res: Response) => {
   try {
@@ -190,6 +193,18 @@ app.get("/api/reports", (req: Request, res: Response) => {
     });
   } catch (error) {
     return res.status(500).json({ success: false, error: String(error) });
+  }
+});
+
+// ======== API Auth =========
+// API untuk login
+app.post("/api/auth/login", (req: Request, res: Response) => {
+  try {
+    const { username, password } = req.body;
+    const result = authService.login(username, password);
+    return res.status(200).json({ success: true, data: result });
+  } catch (error) {
+    return res.status(400).json({ success: false, error: String(error) });
   }
 });
 

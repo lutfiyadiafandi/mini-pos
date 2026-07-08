@@ -3,6 +3,12 @@ import { CategoryController } from "./controllers/CategoryController.js";
 import { DashboardController } from "./controllers/DashboardController.js";
 import { TransactionController } from "./controllers/TransactionController.js";
 import { ReportController } from "./controllers/ReportController.js";
+import { AuthController } from "./controllers/AuthController.js";
+import {
+  loadPageContent,
+  registerPageLoader,
+  updateLayout,
+} from "./utils/PageLoader.js";
 
 // =====================================================================
 // PAGE INITIALIZER
@@ -19,34 +25,21 @@ const pageInitializers: Record<string, () => void> = {
   transactions: () => new TransactionController(),
 
   reports: () => new ReportController(),
+
+  login: () => new AuthController(),
 };
 
 // =====================================================================
 // PAGE LOADER
 // =====================================================================
 
-const mainContent = document.querySelector<HTMLElement>("#main-content");
+const mainContent = document.querySelector<HTMLElement>("#main-content")!;
+async function loadPage(page: string) {
+  await loadPageContent(page, mainContent);
 
-async function loadPage(page: string): Promise<void> {
-  if (!mainContent) return;
-
-  try {
-    const response = await fetch(`./pages/${page}.html`);
-    if (!response.ok) throw new Error(`Halaman "${page}" tidak ditemukan`);
-
-    mainContent.innerHTML = await response.text();
-
-    pageInitializers[page]?.();
-  } catch (err) {
-    console.error(err);
-    mainContent.innerHTML = `
-        <article>
-            <h3>Halaman gagal dimuat</h3>
-            <p>${(err as Error).message}</p>
-        </article>
-        `;
-  }
+  pageInitializers[page]?.();
 }
+registerPageLoader(loadPage);
 
 // =====================================================================
 // SIDEBAR NAVIGATION
@@ -63,8 +56,29 @@ navLinks.forEach((link) => {
   });
 });
 
+// User info
+const userInfo = document.querySelector<HTMLElement>("#user-info")!;
+const currentUser = sessionStorage.getItem("currentUser");
+if (currentUser) {
+  userInfo.textContent = JSON.parse(currentUser).username;
+}
+
+// HandleLogout
+const logoutBtn = document.querySelector<HTMLButtonElement>("#btn-logout");
+
+logoutBtn?.addEventListener("click", () => {
+  sessionStorage.removeItem("currentUser");
+  updateLayout();
+  loadPage("login");
+});
+
 // =====================================================================
 // START APPLICATION
 // =====================================================================
+updateLayout();
 
-loadPage("dashboard");
+if (sessionStorage.getItem("currentUser")) {
+  loadPage("dashboard");
+} else {
+  loadPage("login");
+}

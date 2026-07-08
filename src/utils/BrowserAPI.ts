@@ -104,4 +104,12 @@ export class BrowserAPI {
   async reportsGetAll(): Promise<any> {
     return this.fetchApi("/reports");
   }
+
+  // ======= API Auth ========
+  async login(data: Record<string, unknown>): Promise<any> {
+    return this.fetchApi("/auth/login", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
 }

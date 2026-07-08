@@ -20,6 +20,10 @@ body {
   min-height: 100vh;
 }
 
+.app-layout.login-layout {
+  grid-template-columns: 1fr;
+}
+
 /* ===============================
    SIDEBAR
 ================================= */
@@ -230,6 +234,33 @@ form {
 
 #btn-process-transaction {
   width: 100%;
+}
+
+/* ===============================
+   LOGIN
+================================= */
+
+.login-page {
+  display: grid;
+  place-items: center;
+  min-height: calc(100vh - 4rem);
+}
+
+.login-card {
+  width: 100%;
+  max-width: 420px;
+  padding: 2rem;
+  border: 1px solid var(--pico-muted-border-color);
+  border-radius: var(--pico-border-radius);
+}
+
+.login-card header {
+  text-align: center;
+  margin-bottom: 1rem;
+}
+
+.login-card button {
+  margin-top: 1rem;
 }
 
 /* ===============================

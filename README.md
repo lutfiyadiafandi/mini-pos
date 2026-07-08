@@ -17,7 +17,7 @@ Langkah-langkah untuk menginstal:
 
 ## Kelengkapan Fitur
 
-1. Login Screen
+1. Login Screen ✅
 2. Dashboard ✅
 3. Product Management (CRUD) ✅
 4. Category Management (CRUD) ✅
@@ -25,4 +25,10 @@ Langkah-langkah untuk menginstal:
 6. Sales Report (Filter + Table + Export CSV) ✅
 7. User Management
 
-## Fitur Tambahan
+## Credentials
+
+Username - Password
+
+1. admin - admin123
+2. kasir01 - kasir123
+3. kasir02 - kasir123
