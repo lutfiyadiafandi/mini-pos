@@ -23,7 +23,7 @@ Langkah-langkah untuk menginstal:
 4. Category Management (CRUD) ✅
 5. Transaction (Cart -> Payment -> Receipt) ✅
 6. Sales Report (Filter + Table + Export CSV) ✅
-7. User Management
+7. User Management ✅
 
 ## Credentials
 

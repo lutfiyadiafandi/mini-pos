@@ -29,7 +29,7 @@ export class ProductService {
   }
 
   searchProducts(keyword: string): Product[] {
-    if (keyword || keyword.trim().length == 0) {
+    if (keyword || keyword.trim().length === 0) {
       return this.productRepo.findAll();
     }
     return this.productRepo.search(keyword.trim());

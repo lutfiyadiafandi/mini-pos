@@ -112,4 +112,34 @@ export class BrowserAPI {
       body: JSON.stringify(data),
     });
   }
+
+  // ======= API User ========
+  async userGetAll(): Promise<any> {
+    return this.fetchApi("/users");
+  }
+
+  async userGetById(id: number): Promise<any> {
+    return this.fetchApi(`/users/${id}`);
+  }
+
+  // Panggil Endpoint Simpan Objek Backend
+  async userCreate(data: Record<string, unknown>): Promise<any> {
+    return this.fetchApi("/users", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  async userUpdate(id: number, data: Record<string, unknown>): Promise<any> {
+    return this.fetchApi(`/users/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    });
+  }
+
+  async userDelete(id: number): Promise<any> {
+    return this.fetchApi(`/users/${id}`, {
+      method: "DELETE",
+    });
+  }
 }

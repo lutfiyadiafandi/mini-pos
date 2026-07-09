@@ -3,6 +3,8 @@ import { ValidationError } from "../errors/AppError.js";
 import Database from "better-sqlite3";
 import { DatabaseConnection } from "../database/connection.js";
 import { createHash } from "crypto";
+import { Admin } from "../models/Admin.js";
+import { Cashier } from "../models/Cashier.js";
 
 /**
  * Service untuk autentikasi user.
@@ -40,7 +42,21 @@ export class AuthService {
     }
 
     // Buat User object sesuai role
-    const user = new User(row.id, row.username, row.password, row.full_name);
+    let user: User;
+
+    switch (row.role) {
+      case "ADMIN":
+        user = new Admin(row.id, row.username, row.password, row.full_name);
+        break;
+
+      case "CASHIER":
+        user = new Cashier(row.id, row.username, row.password, row.full_name);
+        break;
+
+      default:
+        throw new Error("Role tidak dikenali");
+    }
+
     this.currentUser = user;
     return user;
   }

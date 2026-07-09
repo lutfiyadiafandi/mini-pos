@@ -4,11 +4,13 @@ import { DashboardController } from "./controllers/DashboardController.js";
 import { TransactionController } from "./controllers/TransactionController.js";
 import { ReportController } from "./controllers/ReportController.js";
 import { AuthController } from "./controllers/AuthController.js";
+import { UserController } from "./controllers/UserController.js";
 import {
   loadPageContent,
+  refreshUserUI,
   registerPageLoader,
   updateLayout,
-} from "./utils/PageLoader.js";
+} from "./utils/PageLoad.js";
 
 // =====================================================================
 // PAGE INITIALIZER
@@ -25,6 +27,8 @@ const pageInitializers: Record<string, () => void> = {
   transactions: () => new TransactionController(),
 
   reports: () => new ReportController(),
+
+  users: () => new UserController(),
 
   login: () => new AuthController(),
 };
@@ -56,18 +60,12 @@ navLinks.forEach((link) => {
   });
 });
 
-// User info
-const userInfo = document.querySelector<HTMLElement>("#user-info")!;
-const currentUser = sessionStorage.getItem("currentUser");
-if (currentUser) {
-  userInfo.textContent = JSON.parse(currentUser).username;
-}
-
 // HandleLogout
 const logoutBtn = document.querySelector<HTMLButtonElement>("#btn-logout");
 
 logoutBtn?.addEventListener("click", () => {
   sessionStorage.removeItem("currentUser");
+  refreshUserUI();
   updateLayout();
   loadPage("login");
 });
@@ -75,6 +73,7 @@ logoutBtn?.addEventListener("click", () => {
 // =====================================================================
 // START APPLICATION
 // =====================================================================
+refreshUserUI();
 updateLayout();
 
 if (sessionStorage.getItem("currentUser")) {

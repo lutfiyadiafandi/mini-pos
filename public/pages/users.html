@@ -1,0 +1,79 @@
+<section>
+  <header>
+    <hgroup>
+      <h2>Manajemen User</h2>
+      <p>Kelola data user Mini POS (Khusus Admin)</p>
+    </hgroup>
+  </header>
+
+  <!-- Search & Filter -->
+  <div class="search-bar">
+    <input
+      type="search"
+      id="user-search"
+      placeholder="Cari user (username atau nama lengkap)"
+    />
+  </div>
+
+  <!-- User Form (Add/Edit) -->
+  <details id="user-form-container">
+    <summary role="button" class="outline">Tambah User Baru</summary>
+    <form id="user-form">
+      <div class="grid">
+        <input type="hidden" name="id" />
+        <label>
+          Username *
+          <input type="text" name="username" required placeholder="Username" />
+        </label>
+        <label>
+          Password *
+          <input type="password" name="password" placeholder="Password" />
+        </label>
+      </div>
+      <div class="grid">
+        <label>
+          Nama Lengkap *
+          <input
+            type="text"
+            name="full_name"
+            required
+            placeholder="Nama Lengkap"
+          />
+        </label>
+        <label>
+          Role *
+          <select name="role" id="role-select" required>
+            <option value="">-- Pilih Role --</option>
+            <option value="ADMIN">Admin</option>
+            <option value="CASHIER">Kasir</option>
+          </select>
+        </label>
+      </div>
+      <div class="grid">
+        <button type="submit">Simpan</button>
+        <button type="reset" class="outline">Reset</button>
+      </div>
+    </form>
+  </details>
+
+  <!-- Error/Success Message -->
+  <div id="user-message" role="alert" style="display: none"></div>
+
+  <!-- User Table -->
+  <figure>
+    <table role="grid">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>Username</th>
+          <th>Nama Lengkap</th>
+          <th>Role</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="user-table-body">
+        <!-- Rows di-render oleh UserView -->
+      </tbody>
+    </table>
+  </figure>
+</section>

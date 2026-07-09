@@ -6,6 +6,8 @@ import {
   ValidationError,
   DatabaseError,
 } from "../errors/AppError.js";
+import { Admin } from "../models/Admin.js";
+import { Cashier } from "../models/Cashier.js";
 
 export class UserRepository {
   private db: Database.Database;
@@ -18,7 +20,7 @@ export class UserRepository {
    */
   findAll(): User[] {
     const rows = this.db
-      .prepare("SELECT * FROM users ORDER BY username")
+      .prepare("SELECT * FROM users WHERE is_active = 1 ORDER BY username")
       .all() as any[];
 
     return rows.map((row) => this.mapToUser(row));
@@ -29,9 +31,9 @@ export class UserRepository {
    * @throws NotFoundError jika user tidak ditemukan
    */
   findById(id: number): User {
-    const row = this.db.prepare("SELECT * FROM users WHERE id = ?").get(id) as
-      | any
-      | undefined;
+    const row = this.db
+      .prepare("SELECT * FROM users WHERE id = ? AND is_active = 1")
+      .get(id) as any | undefined;
     if (!row) {
       throw new NotFoundError(`User dengan ID ${id} tidak ditemukan`);
     }
@@ -43,16 +45,12 @@ export class UserRepository {
    * Cari user berdasarkan username.
    * @throws NotFoundError jika user tidak ditemukan
    */
-  findByUsername(username: string): User {
+  findByUsername(username: string): User | undefined {
     const row = this.db
-      .prepare("SELECT * FROM users WHERE username = ?")
+      .prepare("SELECT * FROM users WHERE username = ? AND is_active = 1")
       .get(username) as any | undefined;
-    if (!row) {
-      throw new NotFoundError(
-        `User dengan username ${username} tidak ditemukan`,
-      );
-    }
-    return this.mapToUser(row);
+
+    return row ? this.mapToUser(row) : undefined;
   }
 
   /**
@@ -103,7 +101,7 @@ export class UserRepository {
                 password = COALESCE(?, password),              
                 full_name = COALESCE(?, full_name),              
                 role = COALESCE(?, role)
-              WHERE id = ?`,
+              WHERE id = ? AND is_active = 1`,
         )
         .run(
           data.username ?? null,
@@ -120,9 +118,49 @@ export class UserRepository {
   }
 
   /**
+   * Soft delete set is active 0.
+   * @throws NotFoundError jika user tidak ditemukan
+   */
+  delete(id: number): void {
+    // Pastikan ada
+    this.findById(id);
+
+    this.db
+      .prepare(
+        "UPDATE users SET is_active = 0, updated_at = datetime('now') WHERE id = ? AND is_active = 1",
+      )
+      .run(id);
+  }
+
+  /**
+   * Search username berdasarkan nama dan fullname
+   */
+  search(keyword: string): User[] {
+    const rows = this.db
+      .prepare(
+        `SELECT * FROM users
+             WHERE is_active = 1 
+             AND (username LIKE ? OR full_name LIKE ?)
+             ORDER BY username`,
+      )
+      .all(`%${keyword}%`, `%${keyword}%`) as any[];
+
+    return rows.map((row) => this.mapToUser(row));
+  }
+
+  /**
    * Mapping dari database row ke domain object User.
    */
   private mapToUser(row: any): User {
-    return new User(row.id, row.username, row.password, row.full_name);
+    switch (row.role) {
+      case "ADMIN":
+        return new Admin(row.id, row.username, row.password, row.full_name);
+
+      case "CASHIER":
+        return new Cashier(row.id, row.username, row.password, row.full_name);
+
+      default:
+        throw new Error("Role tidak valid");
+    }
   }
 }

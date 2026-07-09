@@ -1,14 +1,13 @@
-import { Product } from "../models/Product.js";
-import { Category } from "../models/Category.js";
+import { User } from "../models/User.js";
 
 /**
- * Category View class yang meng-encapsulate semua DOM manipulation
- * untuk halaman manajemen kategori.
+ * User View class yang meng-encapsulate semua DOM manipulation
+ * untuk halaman manajemen user.
  *
  * Prinsip: View HANYA bertanggung jawab untuk rendering dan event capturing
  * View TIDAK melakukan business logic atau data access.
  */
-export class CategoryView {
+export class UserView {
   private tableBody: HTMLTableSectionElement;
   private form: HTMLFormElement;
   private searchInput: HTMLInputElement;
@@ -33,11 +32,11 @@ export class CategoryView {
     this.onSearch = onSearch;
 
     // Ambil referensi ke DOM elements
-    this.tableBody = document.querySelector("#category-table-body")!;
-    this.form = document.querySelector("#category-form")!;
-    this.searchInput = document.querySelector("#category-search")!;
-    this.messageDiv = document.querySelector("#category-message")!;
-    this.formContainer = document.querySelector("#category-form-container")!;
+    this.tableBody = document.querySelector("#user-table-body")!;
+    this.form = document.querySelector("#user-form")!;
+    this.searchInput = document.querySelector("#user-search")!;
+    this.messageDiv = document.querySelector("#user-message")!;
+    this.formContainer = document.querySelector("#user-form-container")!;
 
     // Bind events
     this.form.addEventListener("submit", (e) => this.handleSubmit(e));
@@ -47,59 +46,70 @@ export class CategoryView {
   }
 
   /**
-   * Render daftar kategori ke tabel.
+   * Render daftar user ke tabel.
    */
-  renderCategories(categories: Category[], products: Product[]): void {
-    if (categories.length === 0) {
+  renderUsers(
+    users: {
+      id: number;
+      username: string;
+      fullName: string;
+      role: string;
+    }[],
+  ): void {
+    if (users.length === 0) {
       this.tableBody.innerHTML = `
-          <tr>
-                <td colspan="6" style="text-align: center;">
-                    Tidak ada kategori ditemukan
-                </td>
-          </tr>
-          `;
+        <tr>
+            <td colspan="6" style="text-align: center;">
+                Tidak ada user ditemukan
+            </td>
+        </tr>
+        `;
       return;
     }
 
-    this.tableBody.innerHTML = categories
-      .map((c) => {
-        const productCount = products.filter(
-          (product) => product.categoryId === c.id,
-        ).length;
-
-        return `
-            <tr>
-                <td><code>${this.escapeHtml(String(c.id))}</code></td>
-                <td>${this.escapeHtml(c.name)}</td>
-                <td>${this.escapeHtml(
-                  c.description !== "" ? c.description : "-",
-                )}</td>
-                <td><strong>${productCount}</strong></td>
-                <td>
+    this.tableBody.innerHTML = users
+      .map(
+        (u) => `
+        <tr>
+            <td><code>${this.escapeHtml(String(u.id))}</code></td>
+            <td>${this.escapeHtml(u.username)}</td>
+            <td>${this.escapeHtml(u.fullName)}</td>
+            <td>
+            ${u.role === "ADMIN" ? "<mark>ADMIN</mark>" : "CASHIER"}
+            </td>
+            <td>
                 <div class="grid" style="gap: 0.5rem; ">
-                    <button class="btn-edit outline pico-background-green-500 pico-color-green-600" data-id="${c.id}">
+                    <button class="btn-edit outline pico-background-green-500 pico-color-green-600" data-id="${u.id}">
                         Edit
                     </button>
-                    <button class="btn-delete outline pico-background-red-500 pico-color-red-600" data-id="${c.id}">
+                    <button class="btn-delete outline pico-background-red-500 pico-color-red-600" data-id="${u.id}">
                         Hapus
                     </button>
                 </div>
             </td>
-            </tr>`;
-      })
+        </tr>
+        `,
+      )
       .join("");
 
     this.bindRowEvents();
   }
 
-  fillForm(category: any): void {
+  fillForm(user: any): void {
     (this.form.elements.namedItem("id") as HTMLInputElement).value = String(
-      category.id,
+      user.id,
     );
-    (this.form.elements.namedItem("name") as HTMLInputElement).value =
-      category.name;
-    (this.form.elements.namedItem("description") as HTMLTextAreaElement).value =
-      category.description;
+    (this.form.elements.namedItem("username") as HTMLInputElement).value =
+      user.username;
+    const passwordInput = this.form.elements.namedItem(
+      "password",
+    ) as HTMLInputElement;
+    passwordInput.value = "";
+    passwordInput.placeholder = "Kosongkan jika tidak ingin mengganti password";
+    (this.form.elements.namedItem("full_name") as HTMLInputElement).value =
+      user.fullName;
+    (this.form.elements.namedItem("role") as HTMLInputElement).value =
+      user.role;
 
     window.scrollTo({ top: 0, behavior: "smooth" });
     this.formContainer.open = true;
@@ -111,12 +121,13 @@ export class CategoryView {
   showSuccess(message: string): void {
     this.messageDiv.textContent = message;
     this.messageDiv.style.display = "block";
-    this.messageDiv.className = "";
+    this.messageDiv.style.color = "var(--pico-color-green-500, green)";
     this.messageDiv.setAttribute("role", "alert");
 
     // Auto-hide setelah 3 detik
     setTimeout(() => {
       this.messageDiv.style.display = "none";
+      this.messageDiv.className = "";
     }, 3_000);
   }
 
@@ -150,8 +161,10 @@ export class CategoryView {
 
     this.onSave({
       id: Number(formData.get("id")) || undefined,
-      name: formData.get("name") as string,
-      description: (formData.get("description") as string) ?? "",
+      username: formData.get("username") as string,
+      password: formData.get("password") as string,
+      full_name: formData.get("full_name") as string,
+      role: formData.get("role") as string,
     });
   }
 
@@ -160,7 +173,7 @@ export class CategoryView {
     this.tableBody.querySelectorAll(".btn-delete").forEach((btn) => {
       btn.addEventListener("click", (e) => {
         const id = Number((e.target as HTMLElement).dataset.id);
-        if (confirm("Yakin hapus kategori ini?")) {
+        if (confirm("Yakin hapus user ini?")) {
           this.onDelete(id);
         }
       });

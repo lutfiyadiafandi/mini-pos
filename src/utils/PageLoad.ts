@@ -48,3 +48,26 @@ export function updateLayout() {
     appLayout.classList.add("login-layout");
   }
 }
+
+export function refreshUserUI() {
+  const userInfo = document.querySelector<HTMLElement>("#user-info");
+  const menuUsers = document.querySelector<HTMLElement>("#menu-users");
+
+  const currentUser = sessionStorage.getItem("currentUser");
+
+  if (!currentUser) {
+    if (userInfo) userInfo.textContent = "";
+    if (menuUsers) menuUsers.style.display = "none";
+    return;
+  }
+
+  const user = JSON.parse(currentUser);
+
+  if (userInfo) {
+    userInfo.textContent = `${user.role === "ADMIN" ? "Admin" : "Kasir"}: ${user.fullName}`;
+  }
+
+  if (menuUsers) {
+    menuUsers.style.display = user.role === "ADMIN" ? "" : "none";
+  }
+}

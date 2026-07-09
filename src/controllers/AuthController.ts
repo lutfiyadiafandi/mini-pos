@@ -1,6 +1,6 @@
 import { BrowserAPI } from "../utils/BrowserAPI.js";
 import { AuthView } from "../views/AuthView.js";
-import { navigate, updateLayout } from "../utils/PageLoader.js";
+import { navigate, refreshUserUI, updateLayout } from "../utils/PageLoad.js";
 
 export class AuthController {
   private api: BrowserAPI;
@@ -14,6 +14,7 @@ export class AuthController {
     );
 
     if (this.getCurrentUser()) {
+      refreshUserUI();
       updateLayout();
       navigate("dashboard");
       return;
@@ -35,12 +36,13 @@ export class AuthController {
         return;
       }
 
-      const user = this.mapUser(result.data);
-      sessionStorage.setItem("currentUser", JSON.stringify(user));
+      sessionStorage.setItem("currentUser", JSON.stringify(result.data));
 
-      this.view.showSuccess(`Selamat datang, ${user.fullName}!`);
+      refreshUserUI();
+      updateLayout();
+
+      this.view.showSuccess(`Selamat datang, ${result.data.fullName}!`);
       setTimeout(() => {
-        updateLayout();
         navigate("dashboard");
       }, 700);
     } catch (err) {
@@ -68,14 +70,5 @@ export class AuthController {
   // Cek apakah sudah ada user yang login
   isLoggedIn(): boolean {
     return sessionStorage.getItem("currentUser") != null;
-  }
-
-  private mapUser(user: any) {
-    return {
-      id: user._id,
-      username: user._username,
-      fullName: user._fullName,
-      role: user._role,
-    };
   }
 }

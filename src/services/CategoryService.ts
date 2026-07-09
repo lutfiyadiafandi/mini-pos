@@ -25,7 +25,7 @@ export class CategoryService {
   }
 
   searchCategories(keyword: string): Category[] {
-    if (keyword || keyword.trim().length == 0) {
+    if (keyword || keyword.trim().length === 0) {
       return this.categoryRepo.findAll();
     }
     return this.categoryRepo.search(keyword.trim());

@@ -87,6 +87,10 @@ export class User extends BaseModel {
     return "USER";
   }
 
+  isAdmin(): boolean {
+    return this.getRole() === "ADMIN";
+  }
+
   /**
    * Method yang akan di override oleh subclass.
    * Base User tidak punya akses ke fitur apapun.

@@ -5,10 +5,12 @@ import { DatabaseConnection } from "./database/connection.js";
 import { ProductRepository } from "./repositories/ProductRepository.js";
 import { CategoryRepository } from "./repositories/CategoryRepository.js";
 import { TransactionRepository } from "./repositories/TransactionRepository.js";
+import { UserRepository } from "./repositories/UserRepository.js";
 import { ProductService } from "./services/ProductService.js";
 import { CategoryService } from "./services/CategoryService.js";
 import { TransactionService } from "./services/TransactionService.js";
 import { AuthService } from "./services/AuthService.js";
+import { UserService } from "./services/UserService.js";
 import { PaymentFactory } from "./strategies/PaymentFactory.js";
 
 const app = express();
@@ -21,11 +23,13 @@ const db = DatabaseConnection.getInstance();
 const productRepo = new ProductRepository();
 const categoryRepo = new CategoryRepository();
 const transactionRepo = new TransactionRepository();
+const userRepo = new UserRepository();
 
 const categoryService = new CategoryService(categoryRepo);
 const productService = new ProductService(productRepo, categoryRepo);
 const transactionService = new TransactionService(transactionRepo, productRepo);
 const authService = new AuthService();
+const userService = new UserService(userRepo);
 
 // ======= ENDPOINT ROUTES ======
 
@@ -202,11 +206,77 @@ app.post("/api/auth/login", (req: Request, res: Response) => {
   try {
     const { username, password } = req.body;
     const result = authService.login(username, password);
+    return res.status(200).json({
+      success: true,
+      data: mapUser(result),
+    });
+  } catch (error) {
+    return res.status(400).json({ success: false, error: String(error) });
+  }
+});
+
+// ======== API Users =========
+// API untuk mendapatkan seluruh user
+app.get("/api/users", (req: Request, res: Response) => {
+  try {
+    const result = userService.getAllUsers(); // Logic PBO
+    return res.status(200).json({ success: true, data: result.map(mapUser) });
+  } catch (error) {
+    return res.status(404).json({ success: false, error: String(error) });
+  }
+});
+
+// API untuk mendapatkan user berdasarkan ID
+app.get("/api/users/:id", (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    const result = userService.getUserById(id); // Logic PBO();
+    return res.status(200).json({ success: true, data: mapUser(result) });
+  } catch (error) {
+    return res.status(404).json({ success: false, error: String(error) });
+  }
+});
+
+// API untuk menambahkan user baru
+app.post("/api/users", (req: Request, res: Response) => {
+  try {
+    const result = userService.createUser(req.body); // req.body dengan method POST
+    return res.status(201).json({ success: true, data: mapUser(result) });
+  } catch (error) {
+    return res.status(400).json({ success: false, error: String(error) });
+  }
+});
+
+// API untuk memperbarui data user
+app.patch("/api/users/:id", (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    const result = userService.updateUser(id, req.body); // req.body dengan method PATCH
+    return res.status(200).json({ success: true, data: mapUser(result) });
+  } catch (error) {
+    return res.status(400).json({ success: false, error: String(error) });
+  }
+});
+
+// API untuk menghapus user
+app.delete("/api/users/:id", (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    const result = userService.deleteUser(id); // req.body dengan method DELETE
     return res.status(200).json({ success: true, data: result });
   } catch (error) {
     return res.status(400).json({ success: false, error: String(error) });
   }
 });
+
+function mapUser(user: any) {
+  return {
+    id: user.id,
+    username: user.username,
+    fullName: user.fullName,
+    role: user.getRole(),
+  };
+}
 
 // START SERVER
 app.listen(3000, () => {
