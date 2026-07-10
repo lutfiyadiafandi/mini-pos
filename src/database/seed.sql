@@ -26,3 +26,7 @@ INSERT INTO products (sku, name, category_id, price, stock, description) VALUES
     ('ST002', 'Buku Tulis', 4, 5000, 150, 'Buku tulis 50 lembar'),
     ('HH001', 'Sabun Cuci', 5, 12000, 2, 'Sabun cuci piring'),
     ('HH002', 'Tisu', 5, 6000, 4, 'Tisu wajah 200 lembar');
+
+-- Seed Customers
+INSERT INTO customers (name, phone, email, tier, points, total_spending) VALUES
+    ('Salma Agustine', '081234567890', 'salma@example.com', 'REGULAR', 0, 0);
