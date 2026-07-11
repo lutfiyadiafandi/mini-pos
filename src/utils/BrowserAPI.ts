@@ -175,6 +175,10 @@ export class BrowserAPI {
     });
   }
 
+  async customerTransactions(id: number): Promise<any> {
+    return this.fetchApi(`/customers/${id}/transactions`);
+  }
+
   async loyaltyTopCustomers(limit: number = 10): Promise<any> {
     return this.fetchApi(`/loyalty/top-customers?limit=${limit}`);
   }

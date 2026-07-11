@@ -198,6 +198,7 @@ app.get("/api/reports", (req: Request, res: Response) => {
     const allTrx = transactionService.getAllTransactions();
     const totalRevenue = allTrx.reduce((sum, t) => sum + t.totalAmount, 0);
     const lowStock = productService.getLowStockProducts();
+    const membershipStats = loyaltyService.getMembershipStats();
     return res.json({
       success: true,
       data: {
@@ -205,6 +206,7 @@ app.get("/api/reports", (req: Request, res: Response) => {
         totalRevenue,
         lowStockCount: lowStock.length,
         lowStockProducts: lowStock,
+        membershipStats,
       },
     });
   } catch (error) {
@@ -332,6 +334,17 @@ app.delete("/api/customers/:id", (req: Request, res: Response) => {
     return res.status(200).json({ success: true, data: result });
   } catch (error) {
     return res.status(400).json({ success: false, error: String(error) });
+  }
+});
+
+// API untuk riwayat belanja seorang customer
+app.get("/api/customers/:id/transactions", (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    const result = transactionService.getTransactionsByCustomerId(id);
+    return res.status(200).json({ success: true, data: result });
+  } catch (error) {
+    return res.status(404).json({ success: false, error: String(error) });
   }
 });
 

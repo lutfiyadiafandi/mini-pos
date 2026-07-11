@@ -165,6 +165,13 @@ export class TransactionService {
   }
 
   /**
+   * Riwayat belanja seorang customer.
+   */
+  getTransactionsByCustomerId(customerId: number): Transaction[] {
+    return this.transactionRepo.findByCustomerId(customerId);
+  }
+
+  /**
    * Generate receipt string untuk console display.
    */
   generateReceipt(transaction: Transaction): string {

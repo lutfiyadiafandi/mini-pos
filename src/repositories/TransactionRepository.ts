@@ -131,4 +131,17 @@ export class TransactionRepository {
 
     return rows.map((row) => this.findById(row.id));
   }
+
+  /**
+   * Ambil semua transaksi milik seorang customer (riwayat belanja member).
+   */
+  findByCustomerId(customerId: number): Transaction[] {
+    const rows = this.db
+      .prepare(
+        "SELECT id FROM transactions WHERE customer_id = ? ORDER BY transaction_date DESC",
+      )
+      .all(customerId) as any[];
+
+    return rows.map((row) => this.findById(row.id));
+  }
 }

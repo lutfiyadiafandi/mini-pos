@@ -13,7 +13,6 @@ import { ValidationError } from "../errors/AppError.js";
 export class LoyaltyService {
   constructor(private customerRepo: CustomerRepository) {}
 
-  // A.1
   getAllCustomers(): Customer[] {
     return this.customerRepo.findAll();
   }
@@ -45,7 +44,7 @@ export class LoyaltyService {
       throw new ValidationError("Format email tidak valid");
     }
 
-    // Member baru selalu REGULAR, points 0, totalSpending 0 (aturan A.1)
+    // Member baru selalu REGULAR, points 0, totalSpending 0
     return this.customerRepo.create(data);
   }
 
@@ -65,7 +64,6 @@ export class LoyaltyService {
 
     // Tier/points/totalSpending TIDAK bisa diubah lewat method ini —
     // hanya lewat mekanisme transaksi & auto-upgrade (kasir tidak boleh set tier manual)
-    // A.2
     return this.customerRepo.update(id, data);
   }
 
@@ -83,7 +81,6 @@ export class LoyaltyService {
     return strategy.calculateDiscount(subtotal);
   }
 
-  // A.3
   /**
    * Hitung poin yang akan didapat dari sebuah transaksi.
    * floor(totalBayarSetelahDiskon / 1000) x pengaliPoin tier
@@ -99,7 +96,6 @@ export class LoyaltyService {
     return Math.floor(amountAfterDiscount / 1000) * strategy.pointMultiplier();
   }
 
-  // A.5
   /**
    * Validasi permintaan redeem poin.
    * @throws ValidationError jika poin tidak cukup atau membuat total bayar < 0
@@ -144,7 +140,6 @@ export class LoyaltyService {
     return this.customerRepo.update(customerId, { points: customer.points });
   }
 
-  // A.6
   /**
    * Cek apakah customer layak naik tier berdasarkan totalSpending saat ini,
    * lalu upgrade jika melewati ambang. Tier tidak pernah turun.
@@ -195,7 +190,6 @@ export class LoyaltyService {
     return this.checkAndUpgradeTier(customerId);
   }
 
-  // A.7
   /**
    * Laporan pelanggan dengan belanja terbanyak.
    * Wajib pakai collection operations (sort/slice/map) — tanpa loop manual.
@@ -205,5 +199,26 @@ export class LoyaltyService {
       .findAll()
       .sort((a, b) => b.totalSpending - a.totalSpending)
       .slice(0, limit);
+  }
+
+  /**
+   * Statistik membership untuk Dashboard (jumlah member per tier & total poin).
+   */
+  getMembershipStats(): {
+    totalMembers: number;
+    regularCount: number;
+    goldCount: number;
+    vipCount: number;
+    totalPoints: number;
+  } {
+    const customers = this.customerRepo.findAll();
+
+    return {
+      totalMembers: customers.length,
+      regularCount: customers.filter((c) => c.tier === "REGULAR").length,
+      goldCount: customers.filter((c) => c.tier === "GOLD").length,
+      vipCount: customers.filter((c) => c.tier === "VIP").length,
+      totalPoints: customers.reduce((sum, c) => sum + c.points, 0),
+    };
   }
 }
