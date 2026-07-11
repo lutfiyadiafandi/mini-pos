@@ -49,6 +49,7 @@ CREATE TABLE customers (
     tier TEXT NOT NULL DEFAULT 'REGULAR' CHECK (tier IN ('REGULAR', 'GOLD', 'VIP')),
     points INTEGER NOT NULL DEFAULT 0 CHECK (points >= 0),
     total_spending REAL NOT NULL DEFAULT 0 CHECK (total_spending >= 0),
+    is_active INTEGER DEFAULT 1,
     created_at TEXT DEFAULT (datetime('now')),
     updated_at TEXT DEFAULT (datetime('now'))
 );

@@ -9,6 +9,7 @@ export class Customer extends BaseModel {
   private _tier: MembershipTierName;
   private _points: number;
   private _totalSpending: number;
+  private _isActive: boolean = true;
 
   constructor(
     id: number,
@@ -63,6 +64,9 @@ export class Customer extends BaseModel {
   }
   get totalSpending(): number {
     return this._totalSpending;
+  }
+  get isActive(): boolean {
+    return this._isActive;
   }
 
   get formattedTotalSpending(): string {
@@ -127,6 +131,13 @@ export class Customer extends BaseModel {
       );
     }
     this._tier = newTier;
+  }
+
+  /**
+   * Deactivate customer (soft delete)
+   */
+  deactivate(): void {
+    this._isActive = false;
   }
 
   override toString(): string {

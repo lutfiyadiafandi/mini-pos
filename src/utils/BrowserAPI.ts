@@ -142,4 +142,40 @@ export class BrowserAPI {
       method: "DELETE",
     });
   }
+
+  // ======= API Customer (Membership & Loyalty) ========
+  async customerGetAll(): Promise<any> {
+    return this.fetchApi("/customers");
+  }
+
+  async customerGetById(id: number): Promise<any> {
+    return this.fetchApi(`/customers/${id}`);
+  }
+
+  async customerCreate(data: Record<string, unknown>): Promise<any> {
+    return this.fetchApi("/customers", {
+      method: "POST",
+      body: JSON.stringify(data),
+    });
+  }
+
+  async customerUpdate(
+    id: number,
+    data: Record<string, unknown>,
+  ): Promise<any> {
+    return this.fetchApi(`/customers/${id}`, {
+      method: "PATCH",
+      body: JSON.stringify(data),
+    });
+  }
+
+  async customerDelete(id: number): Promise<any> {
+    return this.fetchApi(`/customers/${id}`, {
+      method: "DELETE",
+    });
+  }
+
+  async loyaltyTopCustomers(limit: number = 10): Promise<any> {
+    return this.fetchApi(`/loyalty/top-customers?limit=${limit}`);
+  }
 }

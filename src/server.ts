@@ -6,11 +6,13 @@ import { ProductRepository } from "./repositories/ProductRepository.js";
 import { CategoryRepository } from "./repositories/CategoryRepository.js";
 import { TransactionRepository } from "./repositories/TransactionRepository.js";
 import { UserRepository } from "./repositories/UserRepository.js";
+import { CustomerRepository } from "./repositories/CustomerRepository.js";
 import { ProductService } from "./services/ProductService.js";
 import { CategoryService } from "./services/CategoryService.js";
 import { TransactionService } from "./services/TransactionService.js";
 import { AuthService } from "./services/AuthService.js";
 import { UserService } from "./services/UserService.js";
+import { LoyaltyService } from "./services/LoyaltyService.js";
 import { PaymentFactory } from "./strategies/PaymentFactory.js";
 
 const app = express();
@@ -24,10 +26,16 @@ const productRepo = new ProductRepository();
 const categoryRepo = new CategoryRepository();
 const transactionRepo = new TransactionRepository();
 const userRepo = new UserRepository();
+const customerRepo = new CustomerRepository();
 
 const categoryService = new CategoryService(categoryRepo);
 const productService = new ProductService(productRepo, categoryRepo);
-const transactionService = new TransactionService(transactionRepo, productRepo);
+const loyaltyService = new LoyaltyService(customerRepo);
+const transactionService = new TransactionService(
+  transactionRepo,
+  productRepo,
+  loyaltyService,
+);
 const authService = new AuthService();
 const userService = new UserService(userRepo);
 
@@ -155,9 +163,13 @@ app.get("/api/transactions", (req: Request, res: Response) => {
 // API untuk memproses transaksi
 app.post("/api/transactions/process", (req: Request, res: Response) => {
   try {
-    const { userId, cartItems, paymentStrategy } = req.body;
+    const { userId, cartItems, paymentStrategy, customerId, redeemPoints } =
+      req.body;
     const strategy = PaymentFactory.create(paymentStrategy);
-    const result = transactionService.checkout(userId, cartItems, strategy);
+    const result = transactionService.checkout(userId, cartItems, strategy, {
+      customerId,
+      redeemPoints,
+    });
     return res.status(201).json({ success: true, data: result });
   } catch (error) {
     return res.status(400).json({ success: false, error: String(error) });
@@ -266,6 +278,72 @@ app.delete("/api/users/:id", (req: Request, res: Response) => {
     return res.status(200).json({ success: true, data: result });
   } catch (error) {
     return res.status(400).json({ success: false, error: String(error) });
+  }
+});
+
+// ======== API Customers =========
+// API untuk mendapatkan seluruh customer
+app.get("/api/customers", (req: Request, res: Response) => {
+  try {
+    const result = loyaltyService.getAllCustomers();
+    return res.status(200).json({ success: true, data: result });
+  } catch (error) {
+    return res.status(404).json({ success: false, error: String(error) });
+  }
+});
+
+// API untuk mendapatkan customer berdasarkan ID
+app.get("/api/customers/:id", (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    const result = loyaltyService.getCustomerById(id);
+    return res.status(200).json({ success: true, data: result });
+  } catch (error) {
+    return res.status(404).json({ success: false, error: String(error) });
+  }
+});
+
+// API untuk mendaftarkan member baru
+app.post("/api/customers", (req: Request, res: Response) => {
+  try {
+    const result = loyaltyService.registerCustomer(req.body);
+    return res.status(201).json({ success: true, data: result });
+  } catch (error) {
+    return res.status(400).json({ success: false, error: String(error) });
+  }
+});
+
+// API untuk memperbarui profil customer
+app.patch("/api/customers/:id", (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    const result = loyaltyService.updateCustomerProfile(id, req.body);
+    return res.status(200).json({ success: true, data: result });
+  } catch (error) {
+    return res.status(400).json({ success: false, error: String(error) });
+  }
+});
+
+// API untuk soft delete customer
+app.delete("/api/customers/:id", (req: Request, res: Response) => {
+  try {
+    const id = Number(req.params.id);
+    const result = loyaltyService.deleteCustomer(id);
+    return res.status(200).json({ success: true, data: result });
+  } catch (error) {
+    return res.status(400).json({ success: false, error: String(error) });
+  }
+});
+
+// ======== API Loyalty =========
+// API untuk laporan top customers
+app.get("/api/loyalty/top-customers", (req: Request, res: Response) => {
+  try {
+    const limit = req.query.limit ? Number(req.query.limit) : 10;
+    const result = loyaltyService.getTopCustomers(limit);
+    return res.status(200).json({ success: true, data: result });
+  } catch (error) {
+    return res.status(500).json({ success: false, error: String(error) });
   }
 });
 

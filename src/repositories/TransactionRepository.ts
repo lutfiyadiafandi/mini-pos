@@ -12,6 +12,8 @@ export class TransactionRepository {
   /**
    * Simpan transaksi baru beserta detail items.
    * Menggunakan database transaction untuk atomicity.
+   * customerId/discountAmount/pointsEarned bersifat opsional —
+   * transaksi tanpa member (pelanggan biasa) tetap valid.
    */
   create(
     userId: number,
@@ -21,10 +23,14 @@ export class TransactionRepository {
     transactionCode: string,
     cashAmount?: number,
     changeAmount?: number,
+    customerId?: number,
+    discountAmount: number = 0,
+    pointsEarned: number = 0,
   ): Transaction {
     const insertTransaction = this.db.prepare(
-      `INSERT INTO transactions (transaction_code, user_id, total_amount, payment_method, payment_status, cash_amount, change_amount) 
-    VALUES (?, ?, ?, ?, 'SUCCESS', ?, ?)`,
+      `INSERT INTO transactions 
+        (transaction_code, user_id, customer_id, total_amount, discount_amount, points_earned, payment_method, payment_status, cash_amount, change_amount) 
+       VALUES (?, ?, ?, ?, ?, ?, ?, 'SUCCESS', ?, ?)`,
     );
     const insertDetail = this.db.prepare(
       `INSERT INTO transaction_details (transaction_id, product_id, product_name, product_price, quantity, subtotal) 
@@ -35,7 +41,10 @@ export class TransactionRepository {
       const result = insertTransaction.run(
         transactionCode,
         userId,
+        customerId ?? null,
         totalAmount,
+        discountAmount,
+        pointsEarned,
         paymentMethod,
         cashAmount ?? null,
         changeAmount ?? null,
@@ -93,6 +102,9 @@ export class TransactionRepository {
       row.payment_method,
       row.payment_status,
       new Date(row.transaction_date),
+      row.customer_id,
+      row.discount_amount,
+      row.points_earned,
     );
   }
 

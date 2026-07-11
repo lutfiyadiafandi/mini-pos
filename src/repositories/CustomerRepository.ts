@@ -14,11 +14,11 @@ export class CustomerRepository {
   }
 
   /**
-   * Ambil semua customer.
+   * Ambil semua customer aktif.
    */
   findAll(): Customer[] {
     const rows = this.db
-      .prepare("SELECT * FROM customers ORDER BY name")
+      .prepare("SELECT * FROM customers WHERE is_active = 1 ORDER BY name")
       .all() as any[];
 
     return rows.map((row) => this.mapToCustomer(row));
@@ -30,7 +30,7 @@ export class CustomerRepository {
    */
   findById(id: number): Customer {
     const row = this.db
-      .prepare("SELECT * FROM customers WHERE id = ?")
+      .prepare("SELECT * FROM customers WHERE id = ? AND is_active = 1")
       .get(id) as any | undefined;
 
     if (!row) {
@@ -47,7 +47,7 @@ export class CustomerRepository {
    */
   findByPhone(phone: string): Customer | undefined {
     const row = this.db
-      .prepare("SELECT * FROM customers WHERE phone = ?")
+      .prepare("SELECT * FROM customers WHERE phone = ? AND is_active = 1")
       .get(phone) as any | undefined;
 
     return row ? this.mapToCustomer(row) : undefined;
@@ -111,7 +111,7 @@ export class CustomerRepository {
               points = COALESCE(?, points),
               total_spending = COALESCE(?, total_spending),
               updated_at = datetime('now')
-           WHERE id = ?`,
+           WHERE id = ? AND is_active = 1`,
         )
         .run(
           data.name ?? null,
@@ -130,13 +130,29 @@ export class CustomerRepository {
   }
 
   /**
+   * Soft delete set is_active 0.
+   * @throws NotFoundError jika customer tidak ditemukan
+   */
+  delete(id: number): void {
+    // Pastikan ada
+    this.findById(id);
+
+    this.db
+      .prepare(
+        "UPDATE customers SET is_active = 0, updated_at = datetime('now') WHERE id = ? AND is_active = 1",
+      )
+      .run(id);
+  }
+
+  /**
    * Cari customer berdasarkan nama atau nomor HP.
    */
   search(keyword: string): Customer[] {
     const rows = this.db
       .prepare(
         `SELECT * FROM customers
-         WHERE name LIKE ? OR phone LIKE ?
+         WHERE is_active = 1
+         AND (name LIKE ? OR phone LIKE ?)
          ORDER BY name`,
       )
       .all(`%${keyword}%`, `%${keyword}%`) as any[];

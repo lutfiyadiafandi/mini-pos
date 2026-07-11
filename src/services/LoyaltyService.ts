@@ -69,6 +69,10 @@ export class LoyaltyService {
     return this.customerRepo.update(id, data);
   }
 
+  deleteCustomer(id: number): void {
+    this.customerRepo.delete(id);
+  }
+
   /**
    * Hitung nominal diskon untuk customer tertentu berdasarkan tier-nya.
    * @param subtotal subtotal sebelum diskon

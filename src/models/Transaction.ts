@@ -12,8 +12,6 @@ type PaymentMethod = "CASH" | "QRIS" | "TRANSFER" | "CREDIT_CARD";
 type TransactionStatus = "PENDING" | "SUCCESS" | "FAILED";
 
 export class Transaction extends BaseModel {
-  // private static _nextId: number = 1;
-
   private _code: string;
   private _userId: number;
   private _items: TransactionDetail[] = [];
@@ -21,6 +19,9 @@ export class Transaction extends BaseModel {
   private _paymentMethod: PaymentMethod;
   private _status: TransactionStatus = "PENDING";
   private _transactionDate: Date;
+  private _customerId: number | null;
+  private _discountAmount: number;
+  private _pointsEarned: number;
 
   constructor(
     id: number,
@@ -31,6 +32,9 @@ export class Transaction extends BaseModel {
     paymentMethod: PaymentMethod,
     status: TransactionStatus = "PENDING",
     transactionDate: Date = new Date(),
+    customerId: number | null = null,
+    discountAmount: number = 0,
+    pointsEarned: number = 0,
   ) {
     super(id);
     this._code = code;
@@ -40,6 +44,9 @@ export class Transaction extends BaseModel {
     this._paymentMethod = paymentMethod;
     this._status = status;
     this._transactionDate = transactionDate;
+    this._customerId = customerId;
+    this._discountAmount = discountAmount;
+    this._pointsEarned = pointsEarned;
   }
 
   // Getter
@@ -63,6 +70,15 @@ export class Transaction extends BaseModel {
   }
   get transactionDate(): Date {
     return this._transactionDate;
+  }
+  get customerId(): number | null {
+    return this._customerId;
+  }
+  get discountAmount(): number {
+    return this._discountAmount;
+  }
+  get pointsEarned(): number {
+    return this._pointsEarned;
   }
 
   get formattedDate(): string {
@@ -163,12 +179,17 @@ export class Transaction extends BaseModel {
       )
       .join("\n");
 
+    const loyaltyLine = this._customerId
+      ? `  Member ID : ${this._customerId} | Diskon: Rp ${this._discountAmount.toLocaleString("id-ID")} | Poin: +${this._pointsEarned}\n`
+      : "";
+
     return (
       `[Transaction] ${this._code}\n` +
       `  Tanggal   : ${this.formattedDate}\n` +
       `  Kasir ID  : ${this._userId}\n` +
       `  Status    : ${this._status}\n` +
       `  Pembayaran: ${this._paymentMethod}\n` +
+      loyaltyLine +
       `  Items:\n${itemLines}\n` +
       `  Total     : ${this.formattedTotal}`
     );
