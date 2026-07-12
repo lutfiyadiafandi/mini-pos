@@ -151,11 +151,11 @@ table mark {
 /* ===============================
    FORM
 ================================= */
-details#product-form-container {
+details {
   margin-bottom: 1.5rem;
 }
 
-details#product-form-container summary {
+details summary {
   font-weight: 600;
 }
 

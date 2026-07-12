@@ -74,7 +74,7 @@ export class CategoryView {
                 <td>${this.escapeHtml(
                   c.description !== "" ? c.description : "-",
                 )}</td>
-                <td><strong>${productCount}</strong></td>
+                <td>${productCount}</td>
                 <td>
                 <div class="grid" style="gap: 0.5rem; ">
                     <button class="btn-edit outline pico-background-green-500 pico-color-green-600" data-id="${c.id}">

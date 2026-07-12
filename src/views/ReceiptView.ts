@@ -9,6 +9,9 @@ type ReceiptData = {
   paymentMethod: string;
   status: string;
   transactionDate: Date;
+  customerId?: number | null;
+  discountAmount?: number;
+  pointsEarned?: number;
 };
 
 /**
@@ -20,6 +23,18 @@ export class ReceiptView {
    */
   show(transaction: ReceiptData): void {
     const modal = document.createElement("dialog");
+
+    // info member, hanya dirender jika transaksi terhubung ke member
+    const memberSection = transaction.customerId
+      ? `
+            <div style="font-size: 0.85rem;">
+                <p>
+                    <small>Diskon Member: -Rp ${(transaction.discountAmount ?? 0).toLocaleString("id-ID")}</small><br>
+                    <small>Poin Didapat: +${transaction.pointsEarned ?? 0}</small>
+                </p>
+            </div>
+        `
+      : "";
 
     modal.innerHTML = `
         <article style="min-width: 350px; font-family: monospace;">
@@ -58,6 +73,9 @@ export class ReceiptView {
                       .join("")}
                 </tbody>
             </table>
+
+            ${memberSection}
+
             <div style="border-top: 2px solid; padding-top: 0.5rem; margin-top: 0.5rem;">
                 <p style="font-size: 1.25rem; font-weight: bold;">
                     TOTAL: Rp ${transaction.totalAmount.toLocaleString("id-ID")}

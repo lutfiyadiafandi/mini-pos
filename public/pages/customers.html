@@ -1,0 +1,104 @@
+<section>
+  <header>
+    <hgroup>
+      <h2>Manajemen Customer & Membership</h2>
+      <p>Kelola data member, tier, dan poin loyalitas pelanggan</p>
+    </hgroup>
+  </header>
+
+  <!-- Search -->
+  <div class="search-bar">
+    <input
+      type="search"
+      id="customer-search"
+      placeholder="Cari member (nama atau nomor HP)"
+    />
+  </div>
+
+  <!-- Form Tambah/Edit Customer -->
+  <details id="customer-form-container">
+    <summary role="button" class="outline">Tambah Member Baru</summary>
+    <form id="customer-form">
+      <div class="grid">
+        <input type="hidden" name="id" />
+        <label>
+          Nama *
+          <input type="text" name="name" required placeholder="Nama lengkap" />
+        </label>
+        <label>
+          No. HP *
+          <input type="text" name="phone" required placeholder="081234567890" />
+        </label>
+      </div>
+      <div class="grid">
+        <label>
+          Email
+          <input
+            type="email"
+            name="email"
+            placeholder="example@email.com (opsional)"
+          />
+        </label>
+      </div>
+      <div class="grid">
+        <button type="submit">Simpan</button>
+        <button type="reset" class="outline">Reset</button>
+      </div>
+    </form>
+  </details>
+
+  <!-- Error/Success Message -->
+  <div id="customer-message" role="alert" style="display: none"></div>
+
+  <!-- Tabel Member -->
+  <figure>
+    <table role="grid">
+      <thead>
+        <tr>
+          <th>Nama</th>
+          <th>No. HP</th>
+          <th>Tier</th>
+          <th>Poin</th>
+          <th>Total Belanja</th>
+          <th>Aksi</th>
+        </tr>
+      </thead>
+      <tbody id="customer-table-body">
+        <!-- Rows di-render oleh CustomerView -->
+      </tbody>
+    </table>
+  </figure>
+
+  <!-- Modal Detail Profil + Riwayat Belanja -->
+  <dialog id="customer-detail-modal">
+    <article>
+      <header>
+        <a
+          href="#close"
+          aria-label="Close"
+          class="close"
+          id="btn-close-detail"
+        ></a>
+        Profil Member
+      </header>
+      <div id="customer-detail-profile"></div>
+      <h6>Riwayat Belanja</h6>
+      <figure>
+        <table role="grid">
+          <thead>
+            <tr>
+              <th>Kode</th>
+              <th>Tanggal</th>
+              <th>Total</th>
+              <th>Diskon</th>
+              <th>Poin</th>
+            </tr>
+          </thead>
+          <tbody id="customer-detail-history">
+            <!-- Rows di-render oleh CustomerView -->
+          </tbody>
+        </table>
+      </figure>
+    </article>
+  </dialog>
+</section>

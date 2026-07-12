@@ -25,6 +25,10 @@ Langkah-langkah untuk menginstal:
 6. Sales Report (Filter + Table + Export CSV) ✅
 7. User Management ✅
 
+## Fitur Tambahan
+
+8. Membership & Loyalty
+
 ## Credentials
 
 Username - Password

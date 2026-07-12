@@ -9,12 +9,23 @@ export class TransactionView {
   private totalPriceEl: HTMLElement;
   private processButton: HTMLButtonElement;
   private messageDiv: HTMLElement;
+  private memberSearchInput: HTMLInputElement;
+  private memberSearchResults: HTMLElement;
+  private memberSearchArea: HTMLElement;
+  private memberSelectedArea: HTMLElement;
+  private memberSelectedName: HTMLElement;
+  private memberSelectedInfo: HTMLElement;
+  private memberRedeemInput: HTMLInputElement;
+  private btnClearMember: HTMLButtonElement;
 
   private onAddToCart: (id: number) => void;
   private onIncreaseQty: (id: number) => void;
   private onDecreaseQty: (id: number) => void;
   private onCheckout: () => void;
   private onSearch: (keyword: string) => void;
+  private onMemberSearch: (keyword: string) => void;
+  private onSelectMember: (id: number) => void;
+  private onClearMember: () => void;
 
   constructor(
     onAddToCart: (id: number) => void,
@@ -22,12 +33,18 @@ export class TransactionView {
     onDecreaseQty: (id: number) => void,
     onCheckout: () => void,
     onSearch: (keyword: string) => void,
+    onMemberSearch: (keyword: string) => void,
+    onSelectMember: (id: number) => void,
+    onClearMember: () => void,
   ) {
     this.onAddToCart = onAddToCart;
     this.onIncreaseQty = onIncreaseQty;
     this.onDecreaseQty = onDecreaseQty;
     this.onCheckout = onCheckout;
     this.onSearch = onSearch;
+    this.onMemberSearch = onMemberSearch;
+    this.onSelectMember = onSelectMember;
+    this.onClearMember = onClearMember;
 
     this.productTableBody = document.querySelector(
       "#transaction-product-table",
@@ -39,11 +56,28 @@ export class TransactionView {
     this.processButton = document.querySelector("#btn-process-transaction")!;
     this.messageDiv = document.querySelector("#transaction-message")!;
 
+    this.memberSearchInput = document.querySelector("#member-search-input")!;
+    this.memberSearchResults = document.querySelector(
+      "#member-search-results",
+    )!;
+    this.memberSearchArea = document.querySelector("#member-search-area")!;
+    this.memberSelectedArea = document.querySelector("#member-selected-area")!;
+    this.memberSelectedName = document.querySelector("#member-selected-name")!;
+    this.memberSelectedInfo = document.querySelector("#member-selected-info")!;
+    this.memberRedeemInput = document.querySelector("#member-redeem-input")!;
+    this.btnClearMember = document.querySelector("#btn-clear-member")!;
+
     this.processButton.addEventListener("click", () => {
       this.onCheckout();
     });
     this.searchInput.addEventListener("input", () => {
       this.onSearch(this.searchInput.value);
+    });
+    this.memberSearchInput.addEventListener("input", () => {
+      this.onMemberSearch(this.memberSearchInput.value);
+    });
+    this.btnClearMember.addEventListener("click", () => {
+      this.onClearMember();
     });
   }
 
@@ -147,8 +181,79 @@ export class TransactionView {
   }
 
   /**
-   * Success message
+   * Render hasil pencarian member sebagai daftar pilihan.
    */
+  renderMemberResults(
+    customers: { id: number; name: string; phone: string; tier: string }[],
+  ): void {
+    if (customers.length === 0) {
+      this.memberSearchResults.innerHTML = `<small>Tidak ada member ditemukan</small>`;
+      return;
+    }
+
+    this.memberSearchResults.innerHTML = customers
+      .map(
+        (c) => `
+        <button
+            type="button"
+            class="btn-select-member outline"
+            data-id="${c.id}"
+            style="display:block; width:100%; text-align:left; margin-bottom:0.25rem;"
+        >
+            ${this.escapeHtml(c.name)} — ${this.escapeHtml(c.phone)} <mark>${c.tier}</mark>
+        </button>
+        `,
+      )
+      .join("");
+
+    this.memberSearchResults
+      .querySelectorAll(".btn-select-member")
+      .forEach((btn) => {
+        btn.addEventListener("click", (e) => {
+          const id = Number((e.currentTarget as HTMLElement).dataset.id);
+          this.onSelectMember(id);
+        });
+      });
+  }
+
+  /**
+   * Tampilkan member yang sudah dipilih, sembunyikan area pencarian.
+   */
+  showSelectedMember(customer: {
+    name: string;
+    tier: string;
+    points: number;
+  }): void {
+    this.memberSelectedName.textContent = customer.name;
+    this.memberSelectedInfo.textContent = `Tier ${customer.tier} — Poin: ${customer.points.toLocaleString("id-ID")}`;
+    this.memberRedeemInput.max = String(customer.points);
+    this.memberRedeemInput.value = "0";
+
+    this.memberSearchArea.style.display = "none";
+    this.memberSelectedArea.style.display = "block";
+  }
+
+  /**
+   * Reset panel member ke kondisi awal (belum ada member dipilih).
+   */
+  clearSelectedMember(): void {
+    this.memberSearchInput.value = "";
+    this.memberSearchResults.innerHTML = "";
+    this.memberRedeemInput.value = "0";
+
+    this.memberSearchArea.style.display = "block";
+    this.memberSelectedArea.style.display = "none";
+  }
+
+  /**
+   * Ambil jumlah poin yang ingin di-redeem dari input.
+   */
+  getRedeemPoints(): number {
+    const value = Number(this.memberRedeemInput.value);
+    return isNaN(value) || value < 0 ? 0 : value;
+  }
+
+  // ===== Message =====
   showSuccess(message: string): void {
     this.messageDiv.textContent = message;
     this.messageDiv.style.display = "block";
@@ -160,9 +265,6 @@ export class TransactionView {
     }, 3000);
   }
 
-  /**
-   * Error message
-   */
   showError(message: string): void {
     this.messageDiv.textContent = message;
     this.messageDiv.style.display = "block";
@@ -173,9 +275,8 @@ export class TransactionView {
     }, 5000);
   }
 
-  /**
-   * Event tombol tambah produk.
-   */
+  // =========================== PRIVATE METHODS ===========================
+
   private bindProductEvents(): void {
     this.productTableBody.querySelectorAll(".btn-add").forEach((btn) => {
       btn.addEventListener("click", (e) => {
@@ -185,9 +286,6 @@ export class TransactionView {
     });
   }
 
-  /**
-   * Event tombol quantity.
-   */
   private bindCartEvents(): void {
     this.cartContainer.querySelectorAll(".btn-increase").forEach((btn) => {
       btn.addEventListener("click", (e) => {
@@ -204,9 +302,6 @@ export class TransactionView {
     });
   }
 
-  /**
-   * Escape HTML untuk mencegah XSS.
-   */
   private escapeHtml(text: string): string {
     const div = document.createElement("div");
     div.textContent = text;

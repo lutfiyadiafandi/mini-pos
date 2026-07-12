@@ -39,8 +39,42 @@
       </figure>
     </section>
 
-    <!-- Keranjang -->
+    <!-- Keranjang + Member -->
     <aside class="cart-panel">
+      <!-- Panel Member (BARU) -->
+      <article id="member-panel">
+        <header>
+          <strong>Member</strong>
+        </header>
+
+        <!-- Tampil saat belum ada member dipilih -->
+        <div id="member-search-area">
+          <input
+            type="search"
+            id="member-search-input"
+            placeholder="Cari member (nama/HP), kosongkan untuk non-member"
+          />
+          <div id="member-search-results"></div>
+        </div>
+
+        <!-- Tampil saat member sudah dipilih -->
+        <div id="member-selected-area" style="display: none">
+          <p>
+            <strong id="member-selected-name"></strong>
+            <br />
+            <small id="member-selected-info"></small>
+          </p>
+          <label>
+            Redeem Poin (opsional)
+            <input type="number" id="member-redeem-input" min="0" value="0" />
+          </label>
+          <button type="button" id="btn-clear-member" class="outline secondary">
+            Ganti / Batal Member
+          </button>
+        </div>
+      </article>
+
+      <!-- Panel Keranjang -->
       <article>
         <header>
           <strong>Keranjang</strong>
