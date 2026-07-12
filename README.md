@@ -8,7 +8,7 @@
 
 Langkah-langkah untuk menginstal:
 
-1. Clone repo https://github.com/lutfiyadiafandi/mini-pos
+1. Clone repo https://github.com/lutfiyadiafandi/A18.2024.00157_LutfiyadiAfandi_ProyekAkhir_A-Membership
 2. Jalankan perintah
 
 ```bash
