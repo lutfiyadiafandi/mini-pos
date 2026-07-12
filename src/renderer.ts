@@ -5,6 +5,7 @@ import { TransactionController } from "./controllers/TransactionController.js";
 import { ReportController } from "./controllers/ReportController.js";
 import { AuthController } from "./controllers/AuthController.js";
 import { UserController } from "./controllers/UserController.js";
+import { CustomerController } from "./controllers/CustomerController.js";
 import {
   loadPageContent,
   refreshUserUI,
@@ -29,6 +30,8 @@ const pageInitializers: Record<string, () => void> = {
   reports: () => new ReportController(),
 
   users: () => new UserController(),
+
+  customers: () => new CustomerController(),
 
   login: () => new AuthController(),
 };

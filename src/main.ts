@@ -2,9 +2,11 @@ import { DatabaseConnection } from "./database/connection.js";
 import { ProductRepository } from "./repositories/ProductRepository.js";
 import { CategoryRepository } from "./repositories/CategoryRepository.js";
 import { TransactionRepository } from "./repositories/TransactionRepository.js";
+import { CustomerRepository } from "./repositories/CustomerRepository.js";
 import { ProductService } from "./services/ProductService.js";
 import { AuthService } from "./services/AuthService.js";
 import { TransactionService } from "./services/TransactionService.js";
+import { LoyaltyService } from "./services/LoyaltyService.js";
 import { PaymentFactory } from "./strategies/PaymentFactory.js";
 import { ValidationError } from "./errors/AppError.js";
 
@@ -16,11 +18,17 @@ DatabaseConnection.initialize();
 const productRepo = new ProductRepository();
 const categoryRepo = new CategoryRepository();
 const transactionRepo = new TransactionRepository();
+const customerRepo = new CustomerRepository();
 
 // Services (Dependency Injection repo diberikan via constructor)
 const productService = new ProductService(productRepo, categoryRepo);
 const authService = new AuthService();
-const transactionService = new TransactionService(transactionRepo, productRepo);
+const loyaltyService = new LoyaltyService(customerRepo);
+const transactionService = new TransactionService(
+  transactionRepo,
+  productRepo,
+  loyaltyService,
+);
 
 //  ================= TEST AUTH =================
 console.log("\n================= TEST AUTH =================\n");

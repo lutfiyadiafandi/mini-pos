@@ -13,6 +13,7 @@ export class DashboardController {
 
   private async initialize() {
     await this.loadReports();
+    await this.loadTopCustomers();
   }
 
   /**
@@ -33,11 +34,32 @@ export class DashboardController {
             this.mapProduct(product),
           ),
         );
+        if (result.data.membershipStats) {
+          this.view.renderMembershipStats(result.data.membershipStats);
+        }
       }
     } catch (err) {
       console.error("Gagal load reports:", err);
     }
   }
+
+  /**
+   * Merender top customers di halaman dashboard
+   */
+  private async loadTopCustomers(): Promise<void> {
+    try {
+      const result = await this.api.loyaltyTopCustomers(10);
+
+      if (result.success && result.data) {
+        this.view.renderTopCustomers(
+          result.data.map((c: any) => this.mapCustomer(c)),
+        );
+      }
+    } catch (err) {
+      console.error("Gagal load top customers:", err);
+    }
+  }
+
   private mapProduct(product: any) {
     return {
       id: product._id,
@@ -45,6 +67,15 @@ export class DashboardController {
       name: product._name,
       stock: product._stock,
       isLowStock: true,
+    };
+  }
+
+  private mapCustomer(customer: any) {
+    return {
+      name: customer._name,
+      tier: customer._tier,
+      totalSpending: customer._totalSpending,
+      points: customer._points,
     };
   }
 }
