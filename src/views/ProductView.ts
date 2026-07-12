@@ -189,7 +189,7 @@ export class ProductView {
     // Bind delete buttons
     this.tableBody.querySelectorAll(".btn-delete").forEach((btn) => {
       btn.addEventListener("click", (e) => {
-        const id = Number((e.target as HTMLElement).dataset.id);
+        const id = Number((e.currentTarget as HTMLElement).dataset.id);
         if (confirm("Yakin hapus produk ini?")) {
           this.onDelete(id);
         }
@@ -199,7 +199,7 @@ export class ProductView {
     // Bind edit buttons (placeholder full implementation di P09)
     this.tableBody.querySelectorAll(".btn-edit").forEach((btn) => {
       btn.addEventListener("click", (e) => {
-        const id = Number((e.target as HTMLElement).dataset.id);
+        const id = Number((e.currentTarget as HTMLElement).dataset.id);
         this.onEdit(id);
       });
     });

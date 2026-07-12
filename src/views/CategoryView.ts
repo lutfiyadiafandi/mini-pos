@@ -159,7 +159,7 @@ export class CategoryView {
     // Bind delete buttons
     this.tableBody.querySelectorAll(".btn-delete").forEach((btn) => {
       btn.addEventListener("click", (e) => {
-        const id = Number((e.target as HTMLElement).dataset.id);
+        const id = Number((e.currentTarget as HTMLElement).dataset.id);
         if (confirm("Yakin hapus kategori ini?")) {
           this.onDelete(id);
         }
@@ -169,7 +169,7 @@ export class CategoryView {
     // Bind edit buttons
     this.tableBody.querySelectorAll(".btn-edit").forEach((btn) => {
       btn.addEventListener("click", (e) => {
-        const id = Number((e.target as HTMLElement).dataset.id);
+        const id = Number((e.currentTarget as HTMLElement).dataset.id);
         this.onEdit(id);
       });
     });

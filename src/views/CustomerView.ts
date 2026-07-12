@@ -249,7 +249,7 @@ export class CustomerView {
   private bindRowEvents(): void {
     this.tableBody.querySelectorAll(".btn-delete").forEach((btn) => {
       btn.addEventListener("click", (e) => {
-        const id = Number((e.target as HTMLElement).dataset.id);
+        const id = Number((e.currentTarget as HTMLElement).dataset.id);
         if (confirm("Yakin hapus member ini?")) {
           this.onDelete(id);
         }
@@ -258,14 +258,14 @@ export class CustomerView {
 
     this.tableBody.querySelectorAll(".btn-edit").forEach((btn) => {
       btn.addEventListener("click", (e) => {
-        const id = Number((e.target as HTMLElement).dataset.id);
+        const id = Number((e.currentTarget as HTMLElement).dataset.id);
         this.onEdit(id);
       });
     });
 
     this.tableBody.querySelectorAll(".btn-detail-link").forEach((btn) => {
       btn.addEventListener("click", (e) => {
-        const id = Number((e.target as HTMLElement).dataset.id);
+        const id = Number((e.currentTarget as HTMLElement).dataset.id);
         this.onViewDetail(id);
       });
     });
