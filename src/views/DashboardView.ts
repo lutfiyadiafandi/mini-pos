@@ -48,7 +48,7 @@ export class DashboardView {
         (p) => `            <tr>
                                 <td><code>${p.sku}</code></td>
                                 <td>${p.name}</td>
-                                <td><mark>${p.stock}</mark></td>
+                                <td><span class="badge badge-lowstock">${p.stock}</span></td>
                            </tr>
                 `,
       )
@@ -116,12 +116,12 @@ export class DashboardView {
   }
 
   private renderTierBadge(tier: string): string {
-    const colorMap: Record<string, string> = {
-      REGULAR: "",
-      GOLD: "pico-background-amber-500",
-      VIP: "pico-background-violet-500",
+    const classMap: Record<string, string> = {
+      REGULAR: "badge-tier-regular",
+      GOLD: "badge-tier-gold",
+      VIP: "badge-tier-vip",
     };
-    const cls = colorMap[tier] ?? "";
-    return `<mark class="${cls}">${tier}</mark>`;
+    const cls = classMap[tier] ?? "badge-tier-regular";
+    return `<span class="badge ${cls}">${tier}</span>`;
   }
 }

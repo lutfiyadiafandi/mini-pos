@@ -75,15 +75,19 @@ export class UserView {
             <td>${this.escapeHtml(u.username)}</td>
             <td>${this.escapeHtml(u.fullName)}</td>
             <td>
-            ${u.role === "ADMIN" ? "<mark>ADMIN</mark>" : "CASHIER"}
+            ${
+              u.role === "ADMIN"
+                ? '<span class="badge badge-role-admin">ADMIN</span>'
+                : '<span class="badge badge-role-cashier">CASHIER</span>'
+            }
             </td>
             <td>
-                <div class="grid" style="gap: 0.5rem; ">
-                    <button class="btn-edit outline pico-background-green-500 pico-color-green-600" data-id="${u.id}">
-                        Edit
+                <div class="actions-cell">
+                    <button class="btn-icon btn-edit outline" data-id="${u.id}" title="Edit" aria-label="Edit">
+                        ${this.editIcon()}
                     </button>
-                    <button class="btn-delete outline pico-background-red-500 pico-color-red-600" data-id="${u.id}">
-                        Hapus
+                    <button class="btn-icon btn-delete outline" data-id="${u.id}" title="Hapus" aria-label="Hapus">
+                        ${this.deleteIcon()}
                     </button>
                 </div>
             </td>
@@ -195,5 +199,13 @@ export class UserView {
     const div = document.createElement("div");
     div.textContent = text;
     return div.innerHTML;
+  }
+
+  private editIcon(): string {
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>`;
+  }
+
+  private deleteIcon(): string {
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path></svg>`;
   }
 }

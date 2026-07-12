@@ -7,7 +7,7 @@
   </header>
 
   <!-- Filter -->
-  <div class="grid">
+  <div class="filter-bar">
     <label>
       Dari Tanggal
       <input type="date" id="report-start-date" />
@@ -16,22 +16,19 @@
       Sampai Tanggal
       <input type="date" id="report-end-date" />
     </label>
-    <label>
-      &nbsp;
-      <button id="btn-filter-report">Filter</button>
-    </label>
+    <button id="btn-filter-report">Filter</button>
   </div>
 
   <!-- Summary Cards -->
   <div class="grid">
-    <article>
+    <article class="metric-revenue">
       <header>Total Revenue</header>
       <p
         id="report-total-revenue"
         style="font-size: 1.5rem; font-weight: bold"
       ></p>
     </article>
-    <article>
+    <article class="metric-transaction">
       <header>Jumlah Transaksi</header>
       <p id="report-trx-count" style="font-size: 1.5rem; font-weight: bold"></p>
     </article>
@@ -54,9 +51,9 @@
 
   <!-- Transaksi Tabel -->
   <article>
-    <header>
-      Detail Transaksi
-      <button id="btn-export-csv" class="outline" style="float: right">
+    <header class="card-header-flex">
+      <span>Detail Transaksi</span>
+      <button id="btn-export-csv" class="outline secondary btn-sm">
         Export CSV
       </button>
     </header>

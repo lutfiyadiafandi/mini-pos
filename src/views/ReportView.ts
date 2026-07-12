@@ -95,10 +95,20 @@ export class ReportView {
                 <td>${t.transactionDate.toLocaleString("id-ID")}</td>
                 <td>${t.paymentMethod}</td>
                 <td>Rp ${t.totalAmount.toLocaleString("id-ID")}</td>
-                <td>${t.status === "SUCCESS" ? "<mark>SUCCESS</mark>" : t.status}</td>
+                <td>${this.renderStatusBadge(t.status)}</td>
             </tr>
     `,
       )
       .join("");
+  }
+
+  private renderStatusBadge(status: string): string {
+    const classMap: Record<string, string> = {
+      SUCCESS: "badge-status-success",
+      FAILED: "badge-status-failed",
+      PENDING: "badge-status-pending",
+    };
+    const cls = classMap[status] ?? "badge-status-pending";
+    return `<span class="badge ${cls}">${status}</span>`;
   }
 }

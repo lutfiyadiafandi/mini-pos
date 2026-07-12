@@ -80,7 +80,7 @@ export class CustomerView {
         (c) => `
         <tr>
             <td>
-                <a class="btn-detail" data-id="${c.id}" style="text-decoration: none; cursor: pointer;">
+                <a class="btn-detail-link" data-id="${c.id}" style="text-decoration: none; cursor: pointer; color: var(--color-primary); font-weight: 600;">
                     ${this.escapeHtml(c.name)}
                 </a>
             </td>
@@ -89,12 +89,12 @@ export class CustomerView {
             <td>${c.points.toLocaleString("id-ID")}</td>
             <td>Rp ${c.totalSpending.toLocaleString("id-ID")}</td>
             <td>
-                <div class="grid" style="gap: 0.5rem;">                   
-                    <button class="btn-edit outline pico-background-green-500 pico-color-green-600" data-id="${c.id}">
-                        Edit
+                <div class="actions-cell">
+                    <button class="btn-icon btn-edit outline" data-id="${c.id}" title="Edit" aria-label="Edit">
+                        ${this.editIcon()}
                     </button>
-                    <button class="btn-delete outline pico-background-red-500 pico-color-red-600" data-id="${c.id}">
-                        Hapus
+                    <button class="btn-icon btn-delete outline" data-id="${c.id}" title="Hapus" aria-label="Hapus">
+                        ${this.deleteIcon()}
                     </button>
                 </div>
             </td>
@@ -263,7 +263,7 @@ export class CustomerView {
       });
     });
 
-    this.tableBody.querySelectorAll(".btn-detail").forEach((btn) => {
+    this.tableBody.querySelectorAll(".btn-detail-link").forEach((btn) => {
       btn.addEventListener("click", (e) => {
         const id = Number((e.target as HTMLElement).dataset.id);
         this.onViewDetail(id);
@@ -271,19 +271,27 @@ export class CustomerView {
     });
   }
 
-  private renderTierBadge(tier: string): string {
-    const colorMap: Record<string, string> = {
-      REGULAR: "",
-      GOLD: "pico-background-amber-500",
-      VIP: "pico-background-violet-500",
-    };
-    const cls = colorMap[tier] ?? "";
-    return `<mark class="${cls}">${tier}</mark>`;
-  }
-
   private escapeHtml(text: string): string {
     const div = document.createElement("div");
     div.textContent = text;
     return div.innerHTML;
+  }
+
+  private renderTierBadge(tier: string): string {
+    const classMap: Record<string, string> = {
+      REGULAR: "badge-tier-regular",
+      GOLD: "badge-tier-gold",
+      VIP: "badge-tier-vip",
+    };
+    const cls = classMap[tier] ?? "badge-tier-regular";
+    return `<span class="badge ${cls}">${tier}</span>`;
+  }
+
+  private editIcon(): string {
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 20h9"></path><path d="M16.5 3.5a2.121 2.121 0 0 1 3 3L7 19l-4 1 1-4Z"></path></svg>`;
+  }
+
+  private deleteIcon(): string {
+    return `<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 6h18"></path><path d="M8 6V4a2 2 0 0 1 2-2h4a2 2 0 0 1 2 2v2"></path><path d="M19 6l-1 14a2 2 0 0 1-2 2H8a2 2 0 0 1-2-2L5 6"></path><path d="M10 11v6"></path><path d="M14 11v6"></path></svg>`;
   }
 }

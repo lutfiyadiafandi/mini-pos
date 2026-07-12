@@ -140,36 +140,37 @@ export class TransactionView {
     this.cartContainer.innerHTML = cart
       .map(
         (item) => `
-            <article style="margin-bottom:0.75rem">
-                <strong>${this.escapeHtml(item.name)}</strong>
-                <small>
+            <div class="cart-item">
+                <div class="cart-item-name">
+                    <strong>${this.escapeHtml(item.name)}</strong>
+                    <small>
                     Rp ${item.price.toLocaleString("id-ID")}
-                </small>
+                    </small>
+                  </div>
 
-                <div class="grid">
+                <div class="cart-qty-row">
                     <button
-                        class="btn-decrease outline"
+                        class="btn-decrease btn-qty outline"
                         data-id="${item.productId}">
                         -
                     </button>
-                    <span style="text-align:center">
+                    <span style="min-width: 1.5rem; text-align:center">
                         ${item.quantity}
                     </span>
                     <button
-                        class="btn-increase outline"
+                        class="btn-increase btn-qty outline"
                         data-id="${item.productId}"
                         ${item.quantity >= item.stock ? "disabled" : ""}
                     >
                         +
                     </button>
                 </div>
-            </article>
+            </div>
         `,
       )
       .join("");
 
     const totalItem = cart.reduce((sum, item) => sum + item.quantity, 0);
-
     const totalPrice = cart.reduce(
       (sum, item) => sum + item.quantity * item.price,
       0,
@@ -191,6 +192,12 @@ export class TransactionView {
       return;
     }
 
+    const tierClassMap: Record<string, string> = {
+      REGULAR: "badge-tier-regular",
+      GOLD: "badge-tier-gold",
+      VIP: "badge-tier-vip",
+    };
+
     this.memberSearchResults.innerHTML = customers
       .map(
         (c) => `
@@ -198,9 +205,10 @@ export class TransactionView {
             type="button"
             class="btn-select-member outline"
             data-id="${c.id}"
-            style="display:block; width:100%; text-align:left; margin-bottom:0.25rem;"
+            style="display:flex; justify-content:space-between; align-items:center; width:100%; text-align:left; margin-bottom:0.4rem;"
         >
-            ${this.escapeHtml(c.name)} — ${this.escapeHtml(c.phone)} <mark>${c.tier}</mark>
+            <span>${this.escapeHtml(c.name)} — ${this.escapeHtml(c.phone)}</span>
+            <span class="badge ${tierClassMap[c.tier] ?? "badge-tier-regular"}">${c.tier}</span>
         </button>
         `,
       )
