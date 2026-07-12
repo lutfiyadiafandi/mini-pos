@@ -29,4 +29,6 @@ INSERT INTO products (sku, name, category_id, price, stock, description) VALUES
 
 -- Seed Customers
 INSERT INTO customers (name, phone, email, tier, points, total_spending) VALUES
-    ('Salma Agustine', '081234567890', 'salma@example.com', 'REGULAR', 0, 0);
+    ('Salma Agustine', '081234567890', 'salma@example.com', 'REGULAR', 0, 0),
+    ('Agus Bambang', '081234567891', 'agus@example.com', 'GOLD', 0, 1000000),
+    ('Dina Rahayu', '081234567892', 'dina@example.com', 'VIP', 0, 5000000);

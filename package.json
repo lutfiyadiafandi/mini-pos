@@ -8,6 +8,7 @@
     "start": "npm run build && electron .",
     "dev": "tsc --watch",
     "dev:server": "node dist/src/server.js",
+    "seed": "node dist/src/database/seed.js",
     "test:cli": "npm run build && node dist/src/main.js"
   },
   "keywords": [],
